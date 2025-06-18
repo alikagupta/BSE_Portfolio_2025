@@ -60,7 +60,7 @@ Next, I will be moving on to my intensive project: the knee rehabilitation devic
 
 # Schematics 
 
-![picture of circuit](Milestone 1 circut .png)
+![picture of circuit](Milestone1_circut.png)
 
 # Code
 Here's where you'll put your code. The syntax below places it into a block of code. Follow the guide [here]([url](https://www.markdownguide.org/extended-syntax/)) to learn how to customize it to your project needs. 
