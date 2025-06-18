@@ -59,7 +59,8 @@ My starter project was the Retro Arcade Console. It is a roughly hand-sized gami
 Next, I will be moving on to my intensive project: the knee rehabilitation device. This project taught me how to use a multimeter to test for short circuits, which will be very helpful as I move on to my larger, more complex project.
 
 # Schematics 
-(Milestone 1 circut .png)
+
+![picture of circuit](Milestone 1 circut .png)
 
 # Code
 Here's where you'll put your code. The syntax below places it into a block of code. Follow the guide [here]([url](https://www.markdownguide.org/extended-syntax/)) to learn how to customize it to your project needs. 
