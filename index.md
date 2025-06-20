@@ -54,7 +54,7 @@ Next, I hope to place all of this onto the knee compression sleeve and change th
 # Code
 Here's where you'll put your code. The syntax below places it into a block of code. Follow the guide [here]([url](https://www.markdownguide.org/extended-syntax/)) to learn how to customize it to your project needs. 
 
-First Milestone:
+**First Milestone:**
 ```
 //adding needed libraries
 #include <Wire.h>
@@ -185,6 +185,177 @@ void loop() {
 
 }
 
+```
+**Second Milestone:**
+
+```
+//adding needed libraries
+#include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_LSM6DS33.h>
+#include <BleSerial.h>
+#include <iostream>
+#include <cmath>
+
+// creating the Accelerometer and Bluetooth object
+Adafruit_LSM6DS33 lsm6ds33 {};
+BleSerial ble;
+
+
+// delaring and initializing variables
+const int FlexPin = 33;
+const int BuzzerPin = 23;
+float FlexValue = 0;
+float FlexThreshold;
+
+// user can update variables 
+int average = 10;
+int AngleDangerLevel = 3; // 4 = 75, 3 = 90, 2 = 120, 1 = 135
+
+void setup() {
+  Serial.begin(115200);
+  ble.begin("Alika'sKneeRehabValues");
+  pinMode(FlexPin, INPUT);
+  pinMode(BuzzerPin, OUTPUT);
+
+  switch(AngleDangerLevel){
+    case 1:
+      FlexThreshold = 2230;
+      break;
+    case 2:
+      FlexThreshold = 2400;
+      break;
+    case 3:
+      FlexThreshold = 2550;
+      break;
+    case 4:
+      FlexThreshold = 2690;
+      break;
+  }
+
+  //Accelerometer set up
+  lsm6ds33.begin_I2C ();
+  Serial.print("Accelerometer range set to: ");
+  switch (lsm6ds33.getAccelRange()) {
+  case LSM6DS_ACCEL_RANGE_2_G:
+    Serial.println("+-2G");
+    break;
+  case LSM6DS_ACCEL_RANGE_4_G:
+    Serial.println("+-4G");
+    break;
+  case LSM6DS_ACCEL_RANGE_8_G:
+    Serial.println("+-8G");
+    break;
+  case LSM6DS_ACCEL_RANGE_16_G:
+    Serial.println("+-16G");
+    break;
+  }
+
+  Serial.print("Accelerometer data rate set to: ");
+  lsm6ds33.setAccelDataRate(LSM6DS_RATE_52_HZ);
+  switch (lsm6ds33.getAccelDataRate()) {
+  case LSM6DS_RATE_SHUTDOWN:
+    Serial.println("0 Hz");
+    break;
+  case LSM6DS_RATE_12_5_HZ:
+    Serial.println("12.5 Hz");
+    break;
+  case LSM6DS_RATE_26_HZ:
+    Serial.println("26 Hz");
+    break;
+  case LSM6DS_RATE_52_HZ:
+    Serial.println("52 Hz");
+    break;
+  case LSM6DS_RATE_104_HZ:
+    Serial.println("104 Hz");
+    break;
+  case LSM6DS_RATE_208_HZ:
+    Serial.println("208 Hz");
+    break;
+  case LSM6DS_RATE_416_HZ:
+    Serial.println("416 Hz");
+    break;
+  case LSM6DS_RATE_833_HZ:
+    Serial.println("833 Hz");
+    break;
+  case LSM6DS_RATE_1_66K_HZ:
+    Serial.println("1.66 KHz");
+    break;
+  case LSM6DS_RATE_3_33K_HZ:
+    Serial.println("3.33 KHz");
+    break;
+  case LSM6DS_RATE_6_66K_HZ:
+    Serial.println("6.66 KHz");
+    break;
+  }
+
+}
+
+void loop() {   
+  //get sensor data
+  sensors_event_t accel;
+  sensors_event_t gyro;
+  sensors_event_t temp;
+  lsm6ds33.getEvent(&accel, &gyro, &temp);
+  float accX;
+  float accY;
+  float accZ;
+
+  FlexValue = analogRead(FlexPin);
+  accX = accel.acceleration.x;
+  accY = accel.acceleration.y;
+  accZ = accel.acceleration.z;
+  for (int i = 1; i < average; i++){
+    delay(50);
+    FlexValue += analogRead(FlexPin);
+    accX += accel.acceleration.x;
+    accY += accel.acceleration.y;
+    accZ += accel.acceleration.z;
+  }
+  FlexValue /= average;
+  // FlexValue = -6.63232 - sqrt((6.63232)*(6.63232)+ 4*(0.0606061)*(2424.12121-FlexValue));
+  // FlexValue /= -0.0606061*(2);
+  accX /= average;
+  accY /= average;
+  accZ /= average;
+
+  //print flex sensor data
+  Serial.print("Flex Sensor Value: ");
+  Serial.println(FlexValue);
+  ble.println("Flex Sensor Value: ");
+  ble.println(FlexValue);
+
+
+  //print accelerometer data
+
+  Serial.print("\t\tAccel X: ");
+  Serial.print(accX);
+  Serial.print(" \tY: ");
+  Serial.print(accY);
+  Serial.print(" \tZ: ");
+  Serial.print(accZ);
+  Serial.println(" m/s^2 ");
+
+  ble.print("\t\tAccel X: ");
+  ble.print(accX);
+  ble.print(" \tY: ");
+  ble.print(accY);
+  ble.print(" \tZ: ");
+  ble.print(accZ);
+  ble.println(" m/s^2 ");
+
+
+  //Check and Buzz if needed 
+  if(accZ < -2.0 && accY < 1){
+    tone(BuzzerPin, 1000);  
+  }  else if (FlexValue > FlexThreshold) {
+    tone(BuzzerPin, 200);  
+    delay(200);
+    tone(BuzzerPin, 0); 
+  }else{
+    tone(BuzzerPin, 0);  
+  }
+}
 ```
 
 <!-- # Bill of Materials
