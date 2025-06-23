@@ -23,6 +23,14 @@ For your final milestone, explain the outcome of your project. Key details to in
 
 
 -->
+# How it works
+
+**Flex Sensor:**
+![diagram of how a flex sensor works](Flexsensor.png)
+A flex sensor is a variable resistor. When bent, the conductive particles spread apart, increasing the resistance as seen above. 
+
+**Finding a resistor for the flex sensor:**
+While you can use a variety of resistors for a flex sensor, some will give you a better range than others. From Ohm's law, we know we can write Vin/Vout as R1/(R1+R2), and in this case, the flex sensor is R2. I then measured the flex sensor's resistance with a multimeter when it was flat and bent to get its low and high resistances. I wanted to optimise for the largest range, so I wanted to have the highest difference between the ratios of Vin/Vout at the flex sensors' low and high resistance. This makes the equation x/(x+240)-x/(x+300) (graph is below). Taking the derivative of that, we can find a critical point that is a maximum at the square root of 240*300, which is about 268.32. All the measurements are in 1k ohms, so based on these calculations, I chose a 270k ohm resistor.
 
 # Second Milestone
 
@@ -33,7 +41,6 @@ My second milestone consisted of attaching the device to a knee brace (in a temp
 I had a lot of trouble with the regression for converting the flex sensor's raw value to degrees. I tried linear, quadratic, exponential, and logarithmic regressions. In the end I decided that the regression wouldn't work because only the quadratic regression had a pretty high R squared value (it was ~0.99 compared to the ~0.89 of the rest) and since quadratic equations aren't one-to-one, solving for x in terms of y gave me two seperate equations, which I couldn't put together in a peacewise function without it failing the vertical line test. I also tried flipping the x and y values, but then none of the regressions were accurate. Ultimately, I shifted that to a system with 4 pre-set flex sensor threshold levels, where the user could choose between them with a button. 
 
 Next, I hope to get an accurate linear regression and use more advanced averaging techniques. I also hope to incorporate more of a user interface-starting with buttons and later potentially having the user be able to input commands from their phones to the device. For example, for the flex sensor threshold levels, right now they are controlled with a button that just cycles through 4 preset values but hopefuly I can make it so in the bluetooth monitor the user can type in something like "Angle threshold: 75" and that would set the device to beep when the knee is at 75 degrees. Overall, my next steps are going to focus on modifications as the base part of my project is done. My 3rd milestone will be sewing and soldering everything, so I want to finish all the additional circuitry or parts my modifications might need before then.
-
 
 
 # First Milestone
@@ -382,7 +389,7 @@ Next, I will be moving on to my intensive project: the knee rehabilitation devic
 <!-- # Other Resources/Examples
 One of the best parts about Github is that you can view how other people set up their own work. Here are some past BSE portfolios that are awesome examples. You can view how they set up their portfolio, and you can view their index.md files to understand how they implemented different portfolio components.
 - Cirkit Designer
-- [Example 2](https://sviatil0.github.io/Sviatoslav_BSE/)
+- [Instructables](https://www.instructables.com/How-to-Make-FLEX-Sensor-at-Home-DIY-Flex-Sensor/)
 - [Example 3](https://arneshkumar.github.io/arneshbluestamp/)
 
 To watch the BSE tutorial on how to create a portfolio, click here.-->
