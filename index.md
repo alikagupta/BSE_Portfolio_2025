@@ -47,10 +47,8 @@ In an effort to make my flex sensor data more consistent, I explored ways to cre
 Based on that graph, I decided the cutoff frequency should be 1 Hz. Deciding the cutoff is a tradeoff between getting rid of variability and still registering significant movements. I then used a computer to model what the filter looked like (see below) and find the right coefficients. 
 ![graph of biquad filter](filter.png)
 
-A biquad filter uses 6 coefficients: b<sub>0</sub>, b<sub>1</sub>, b<sub>2</sub>, a<sub>0</sub>, a<sub>1</sub> and a<sub>2</sub>. The dagram bellow shows all the values that go into getting your output (y[n])
+A biquad filter uses 6 coefficients: b<sub>0</sub>, b<sub>1</sub>, b<sub>2</sub>, a<sub>0</sub>, a<sub>1</sub> and a<sub>2</sub>. The diagram below shows all the values that go into getting your output (y[n]) from your input (x[n]). In a biquad filter, you also store and use the past 2 input and output values. In the diagram, going back an iteration is represented with z<sup>-1</sup>. All the arrows in the diagram mean multiplication and the + symbols mean addition.
 ![diagram of what a biquad does](diagram.png)
-
-
 
 > [!NOTE]
 > I took all my data and did all my filtration after the linear regression, but since it is a linear regression, you can do it either way.
