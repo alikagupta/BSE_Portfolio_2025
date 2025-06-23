@@ -53,7 +53,9 @@ Based on that graph, I decided the cutoff frequency should be 1 Hz. Deciding the
 </div>
 
 A biquad filter uses 6 coefficients: b<sub>0</sub>, b<sub>1</sub>, b<sub>2</sub>, a<sub>0</sub>, a<sub>1</sub> and a<sub>2</sub>. The diagram below shows all the values that go into getting your output (y[n]) from your input (x[n]). In a biquad filter, you also store and use the past 2 input and output values. In the diagram, going back an iteration is represented with z<sup>-1</sup>. All the arrows in the diagram mean multiplication and the + symbols mean addition.
-![diagram of what a biquad does](diagram.png)
+<div align="center">
+  <img src="diagram.png" width="90%" height="90%">
+</div>
 
 > [!NOTE]
 > I took all my data and did all my filtration after the linear regression, but since it is a linear regression, you can do it either way.
