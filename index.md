@@ -41,11 +41,15 @@ After trying many types of regression, I ultimately went with a linear regressio
 
 ## Digital Biquad Filter:
 
-In an effort to make my flex sensor data more consistent, I explored ways to create a low-pass filter. The goal of this is to push frequencies past a certain threshold to zero. The first step was recording the raw, unaveraged data from the flex sensor. I used a computer to plot a sample of this data when my knee was at 90° for a few seconds. This data was plotted in magnitude with respect to frequency, meaning it tells you what frequencies are represented in the data and how much of each frequency is there. That is the figure below:
+In an effort to make my flex sensor data more consistent, I explored ways to create a low-pass filter. The goal of this is to push frequencies past a certain threshold to zero. The first step was recording the raw, unaveraged data from the flex sensor. I used a computer to plot a sample of this data when my knee was at 90° for a few seconds. This data was plotted in magnitude with respect to frequency, meaning it tells you what frequencies are represented in the data and how much of each frequency is there. This is the figure below:
+![Frequecy graph of raw flex sensor data when knee at 90°](plot.png)
 
+Based on that graph, I decided the cutoff frequency should be 1 Hz. Deciding the cutoff is a tradeoff between getting rid of variability and still registering significant movements. I then used a computer to model what the filter looked like (see below) and find the right coefficients. 
+![graph of biquad filter](filter.png)
 
+A biquad filter uses 6 coefficients: b<sub>0</sub>, b<sub>1</sub>, b<sub>2</sub>, a<sub>0</sub>, a<sub>1</sub> and a<sub>2</sub>. The dagram bellow shows all the values that go into getting your output (y[n])
+![diagram of what a biquad does](diagram.png)
 
-Then 
 
 
 > [!NOTE]
@@ -461,3 +465,4 @@ Next, I will be moving on to my intensive project: the knee rehabilitation devic
 - [Cirkit Designer](https://app.cirkitdesigner.com/)
 - [Instructables](https://www.instructables.com/How-to-Make-FLEX-Sensor-at-Home-DIY-Flex-Sensor/)
 - [Wikipedia on Digital Biquad Filters](https://en.wikipedia.org/wiki/Digital_biquad_filter)
+- [Biquad Calculator](https://www.earlevel.com/main/2021/09/02/biquad-calculator-v3/)
