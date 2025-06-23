@@ -31,7 +31,7 @@ A flex sensor is a variable resistor. When bent, the conductive particles spread
 
 ## Finding a resistor for the flex sensor:
 
-While you can use a variety of resistors for a flex sensor, some will give you a better range than others. From Ohm's law, we know we can write Vin/Vout as $\frac{R_{1}}{R_{1}+R_{2}})$, and in this case, the flex sensor is R2. I then measured the flex sensor's resistance with a multimeter when it was flat and bent to get its low and high resistances. I wanted to optimise for the largest range, so I wanted to have the highest difference between the ratios of Vin/Vout at the flex sensors' low and high resistance. This makes the equation $\frac{x}{x+240}-\frac{x}{x+300}$ (graph is below). Taking the derivative of that, we can find a critical point that is a maximum at $\sqrt{240\left(300\right)}$, which is about 268.32. All the measurements are in 1k ohms, so based on these calculations, I chose a 270k ohm resistor.
+While you can use a variety of resistors for a flex sensor, some will give you a better range than others. From Ohm's law, we know we can write Vin/Vout as $\frac{R_{1}}{R_{1}+R_{2}}$, and in this case, the flex sensor is R2. I then measured the flex sensor's resistance with a multimeter when it was flat and bent to get its low and high resistances. I wanted to optimise for the largest range, so I wanted to have the highest difference between the ratios of Vin/Vout at the flex sensors' low and high resistance. This makes the equation $\frac{x}{x+240}-\frac{x}{x+300}$ (graph is below). Taking the derivative of that, we can find a critical point that is a maximum at $\sqrt{240\left(300\right)}$, which is about 268.32. All the measurements are in 1k ohms, so based on these calculations, I chose a 270k ohm resistor.
 ![graph of range in respect to resistor values](risitorGraph.png)
 
 ## Regression:
@@ -41,11 +41,15 @@ After trying many types of regression, I ultimately went with a linear regressio
 
 ## Digital Biquad Filter:
 
-In an effort to make my flex sensor data more consistent, I explored ways to create a low-pass filter. The goal of this is to push frequencies past a certain threshold to zero. The first step was recording the raw, unaveraged data from the flex sensor. 
+In an effort to make my flex sensor data more consistent, I explored ways to create a low-pass filter. The goal of this is to push frequencies past a certain threshold to zero. The first step was recording the raw, unaveraged data from the flex sensor. I used a computer to plot a sample of this data when my knee was at 90° for a few seconds. This data was plotted in magnitude with respect to frequency, meaning it tells you what frequencies are represented in the data and how much of each frequency is there. That is the figure below:
+
+
+
+Then 
 
 
 > [!NOTE]
-> I took all my data and did all my filtration after the linear regression, but since it is a linear regression you can do it either way
+> I took all my data and did all my filtration after the linear regression, but since it is a linear regression, you can do it either way.
 
 
 # Second Milestone
