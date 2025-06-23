@@ -217,37 +217,33 @@ void loop() {
 Adafruit_LSM6DS33 lsm6ds33 {};
 BleSerial ble;
 
+// user can update variables 
+const int average = 50;
+int AngleDangerLevel = 1; // 4 = 75, 3 = 90, 2 = 120, 1 = 135
+int soundVal = 1000;
 
 // delaring and initializing variables
-const int FlexPin = 33;
-const int BuzzerPin = 23;
+int potValue = 0;
 float FlexValue = 0;
 float FlexThreshold;
+bool on = true;
+float flexvaluesarr[average];
 
-// user can update variables 
-int average = 10;
-int AngleDangerLevel = 3; // 4 = 75, 3 = 90, 2 = 120, 1 = 135
+// Where pins are 
+const int FlexPin = 33;
+const int BuzzerPin = 23;
+const int topbuttonPin = 35;
+const int powerbuttonPin = 4;
+const int potPin = 15; 
 
 void setup() {
   Serial.begin(115200);
   ble.begin("Alika'sKneeRehabValues");
   pinMode(FlexPin, INPUT);
   pinMode(BuzzerPin, OUTPUT);
+  pinMode(topbuttonPin, INPUT_PULLUP);
+  pinMode(powerbuttonPin, INPUT_PULLUP);
 
-  switch(AngleDangerLevel){
-    case 1:
-      FlexThreshold = 2230;
-      break;
-    case 2:
-      FlexThreshold = 2400;
-      break;
-    case 3:
-      FlexThreshold = 2550;
-      break;
-    case 4:
-      FlexThreshold = 2690;
-      break;
-  }
 
   //Accelerometer set up
   lsm6ds33.begin_I2C ();
@@ -268,7 +264,7 @@ void setup() {
   }
 
   Serial.print("Accelerometer data rate set to: ");
-  lsm6ds33.setAccelDataRate(LSM6DS_RATE_52_HZ);
+  lsm6ds33.setAccelDataRate(LSM6DS_RATE_52_HZ); 
   switch (lsm6ds33.getAccelDataRate()) {
   case LSM6DS_RATE_SHUTDOWN:
     Serial.println("0 Hz");
@@ -305,73 +301,128 @@ void setup() {
     break;
   }
 
+  for (int i = 0; i < average; i++){
+    flexvaluesarr[i] = analogRead(FlexPin);
+  }
 }
 
 void loop() {   
-  //get sensor data
-  sensors_event_t accel;
-  sensors_event_t gyro;
-  sensors_event_t temp;
-  lsm6ds33.getEvent(&accel, &gyro, &temp);
-  float accX;
-  float accY;
-  float accZ;
+  int PowbuttonState = digitalRead(powerbuttonPin);
 
-  FlexValue = analogRead(FlexPin);
-  accX = accel.acceleration.x;
-  accY = accel.acceleration.y;
-  accZ = accel.acceleration.z;
-  for (int i = 1; i < average; i++){
-    delay(50);
-    FlexValue += analogRead(FlexPin);
+  while(on){
+    //get sensor + convert/average data
+    sensors_event_t accel;
+    sensors_event_t gyro;
+    sensors_event_t temp;
+    lsm6ds33.getEvent(&accel, &gyro, &temp);
+    float accX;
+    float accY;
+    float accZ;
+    byte topbuttonState = digitalRead(topbuttonPin);
+
+    soundVal = 1.19658*(analogRead(potPin))+100;
+    FlexValue = 0;
+
     accX += accel.acceleration.x;
     accY += accel.acceleration.y;
     accZ += accel.acceleration.z;
+
+    for (int i = 0; i < (average- 1); i++){
+      flexvaluesarr[i] = flexvaluesarr[i+1];
+      FlexValue += flexvaluesarr[i];
+      accX += accel.acceleration.x;
+      accY += accel.acceleration.y;
+      accZ += accel.acceleration.z;
+    }
+    flexvaluesarr[average - 1] = analogRead(FlexPin);
+    FlexValue += flexvaluesarr[average - 1];
+    FlexValue /= average;
+    FlexValue = -0.212069*(FlexValue)+586.55172; // linear regression 
+    accX /= average;
+    accY /= average;
+    accZ /= average;
+
+    checkButtons();
+
+    //print flex sensor data
+
+    Serial.print("Flex Sensor Value: ");
+    Serial.println(FlexValue);
+    // ble.println("Flex Sensor Value: ");
+    // ble.println(FlexValue);
+
+
+    //print accelerometer data
+
+    Serial.print("\t\tAccel X: ");
+    Serial.print(accX);
+    Serial.print(" \tY: ");
+    Serial.print(accY);
+    Serial.print(" \tZ: ");
+    Serial.print(accZ);
+    Serial.println(" m/s^2 ");
+
+    // ble.print("\t\tAccel X: ");
+    // ble.print(accX);
+    // ble.print(" \tY: ");
+    // ble.print(accY);
+    // ble.print(" \tZ: ");
+    // ble.print(accZ);
+    // ble.println(" m/s^2 ");
+
+
+    //Check and Buzz if needed 
+    if(accZ < -2.0 && accY < 1){
+      tone(BuzzerPin, soundVal);  
+    }  else if (FlexValue > FlexThreshold) {
+      tone(BuzzerPin, soundVal-20);  
+      delay(100);
+      tone(BuzzerPin, 0); 
+    }else{
+      tone(BuzzerPin, 0);  
+    }
   }
-  FlexValue /= average;
-  // FlexValue = -6.63232 - sqrt((6.63232)*(6.63232)+ 4*(0.0606061)*(2424.12121-FlexValue));
-  // FlexValue /= -0.0606061*(2);
-  accX /= average;
-  accY /= average;
-  accZ /= average;
-
-  //print flex sensor data
-  Serial.print("Flex Sensor Value: ");
-  Serial.println(FlexValue);
-  ble.println("Flex Sensor Value: ");
-  ble.println(FlexValue);
-
-
-  //print accelerometer data
-
-  Serial.print("\t\tAccel X: ");
-  Serial.print(accX);
-  Serial.print(" \tY: ");
-  Serial.print(accY);
-  Serial.print(" \tZ: ");
-  Serial.print(accZ);
-  Serial.println(" m/s^2 ");
-
-  ble.print("\t\tAccel X: ");
-  ble.print(accX);
-  ble.print(" \tY: ");
-  ble.print(accY);
-  ble.print(" \tZ: ");
-  ble.print(accZ);
-  ble.println(" m/s^2 ");
-
-
-  //Check and Buzz if needed 
-  if(accZ < -2.0 && accY < 1){
-    tone(BuzzerPin, 1000);  
-  }  else if (FlexValue > FlexThreshold) {
-    tone(BuzzerPin, 200);  
-    delay(200);
-    tone(BuzzerPin, 0); 
-  }else{
-    tone(BuzzerPin, 0);  
+  if (PowbuttonState == LOW) { 
+    on = !on;
   }
+  delay(100);
 }
+
+void checkButtons(){
+  // check power 
+  if (digitalRead(powerbuttonPin) == LOW) { 
+    on = !on;
+  } 
+  // angle level 
+  if (digitalRead(topbuttonPin) == LOW) {
+      if(AngleDangerLevel < 4){
+        AngleDangerLevel ++;
+      }else if (AngleDangerLevel == 4){
+        AngleDangerLevel = 1;
+      }
+      Serial.print("Angle Level now: ");
+      Serial.println(AngleDangerLevel);
+      ble.print("Angle Level now: ");
+      ble.println(AngleDangerLevel);
+    }
+  // converting angle level 
+  switch(AngleDangerLevel){
+   case 1:
+      FlexThreshold = 135;
+      break;
+   case 2:
+      FlexThreshold = 120;
+      break;
+   case 3:
+      FlexThreshold = 90;
+      break;
+   case 4:
+      FlexThreshold = 75;
+      break;
+  }
+  delay(100);
+}
+
 ```
 
 <!-- # Bill of Materials
