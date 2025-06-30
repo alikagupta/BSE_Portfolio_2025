@@ -61,11 +61,14 @@ A biquad filter uses 6 coefficients: b<sub>0</sub>, b<sub>1</sub>, b<sub>2</sub>
 > I took all my data and did all my filtration after the linear regression, but since it is a linear regression, you can do it either way.
 
 ## Speaker:
-I decided to add a speaker to my project to make the sound louder and smoother. To test this out, I made a circuit on the breadboard and some test code just for it. The schematic of the circuit is below. To wire this circuit, I needed a transistor, a capacitor, an ESP-32, in addition to the speaker. The resistor I used was a 2.2K ohm resistor, but you can vary the resistor depending on the desired volume. The way this works is the ESP has the ability to make perfect sinusoidal signals, so that signal is created and passed through the capacitor to filter out the constant. The capacitor acts as a filter, and similarly to taking the derivative of a sinusoidal function, is able to preserve the shape of the signal while removing the offset. The signal then goes to the base pin of the transistor. transistors 
-
-<div align="center">
+I decided to add a speaker to my project to make the sound louder and smoother. To test this out, I made a circuit on the breadboard and some test code just for it. The schematic of the circuit is below. 
+**<div align="center">
   <img src="SpeakerScematics.png" width="40%" height="40%">
-</div>
+</div>**
+
+To wire this circuit, I needed a transistor, a capacitor, an ESP-32, in addition to the speaker. The resistor I used was a 2.2K ohm resistor, but you can vary the resistor depending on the desired volume. The way this works is the ESP has the ability to make perfect sinusoidal signals, so that signal is created and passed through the capacitor to filter out the constant. The capacitor acts as a filter, and similarly to taking the derivative of a sinusoidal function, is able to preserve the shape of the signal while removing the offset. The signal then goes to the base pin of the transistor. Transistors have 3 pins: base, collector, and emitter. The base is like the gate that dictates the flow of current from the collector to the emitter. The base value is very small comparatively, as that is what is coming from the ESP's analog pin, rather than the current going through the speaker. The 5V power goes to the speaker directly and then exits to the transistor's collector pin. That then goes through the transistor to its emitter pin, ending at ground. There is also a feedback loop, where the base and collector pins are connected through a resistor, so the current from the collector pin is reduced by the resistor and fed back into the base pin, which "opens the gate" to a stable amount of current flow. 
+
+
 
 # Second Milestone
 
@@ -91,7 +94,7 @@ The main challenge that I faced in this step was getting the accelerometer to co
 Next, I hope to place all of this onto the knee compression sleeve and change the thresholds for the flex sensor and accelerometer so the beeping is as precise as possible. I hope to perform linear regression to get the values of the angles from the flex sensor instead of just the regular flex sensor output, which is usually in the 1000s. How I place the accelerometer will also define what the if statement for when the knee is turning inward looks like.
 
 # Schematics 
-
+**First Milestone:**
 ![picture of circuit](Milestone1_circut.png)
 
 # Code
@@ -452,6 +455,79 @@ void checkButtons(){
 
 ```
 
+**Speaker Test Code (Hynm for the Weekend):**
+```
+// add libraries
+#include <Arduino.h>
+#include "DacESP32.h"
+#include "pitches.h"
+
+#define SPEAKER_PIN 25 // pin for speaker (25 is an anolog and digital pin)
+DacESP32 dac1(25); // Creating speaker object
+
+// song info for Coldplay's Hymn for the weekend -- Credit to  HiBit <https://www.hibit.dev>
+int melody[] = { // notes preset into frequecies in the pitches library
+  NOTE_GS4, NOTE_GS4, NOTE_GS4, NOTE_G4, NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4,
+  NOTE_G4, NOTE_G4, NOTE_G4, NOTE_G4, NOTE_G4, NOTE_G4,NOTE_F4,NOTE_F4,
+  NOTE_GS4, NOTE_GS4, NOTE_GS4, NOTE_G4, NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4,
+  NOTE_G4, NOTE_G4, NOTE_G4, NOTE_G4, NOTE_G4,
+
+  NOTE_DS5, NOTE_D5, NOTE_DS5, NOTE_C5, REST,
+  NOTE_DS5, NOTE_D5, REST,
+  NOTE_F5, NOTE_DS5, REST,
+
+  NOTE_DS5, NOTE_D5, NOTE_DS5, NOTE_C5, REST,
+  NOTE_DS5, NOTE_D5, REST,
+  NOTE_F5, NOTE_DS5, REST,
+
+  NOTE_DS5, NOTE_D5, NOTE_DS5, NOTE_C5, REST,
+  NOTE_DS5, NOTE_D5, REST,
+  NOTE_F5, NOTE_DS5, REST,
+
+  NOTE_AS4, NOTE_C5, NOTE_AS5, NOTE_GS5, NOTE_G5, NOTE_G5,
+};
+
+int durations[] = { //notes are the types so like 4 is a quarter note
+  4, 4, 4, 4, 4, 4, 4, 4,
+  4, 4, 4, 4, 4, 4, 4, 4,
+  4, 4, 4, 4, 4, 4, 4, 4,
+  4, 4, 4, 4, 4,
+
+  4, 4, 4, 2, 4,
+  4, 2, 4,
+  4, 2, 2,
+
+  4, 4, 4, 2, 4,
+  4, 2, 4,
+  4, 2, 2,
+
+  4, 4, 4, 2, 4,
+  4, 2, 4,
+  4, 2, 2,
+
+  4, 4, 4, 2, 2, 1,
+};
+
+
+void setup() {
+}
+
+void loop() {
+  int size = sizeof(durations) / sizeof(int);
+
+  for (int note = 0; note < size; note++) {
+    int duration = 1000 / durations[note];
+    dac1.outputCW(melody[note]); // getting note from array
+    delay(duration); // note duration 
+    int pauseBetweenNotes = duration * 0.30; // pause so you can really hear the notes better
+    delay(pauseBetweenNotes);
+    dac1.outputCW(0);
+  }
+}
+```
+
+
+
 <!-- # Bill of Materials
 Here's where you'll list the parts in your project. To add more rows, just copy and paste the example rows below.
 Don't forget to place the link of where to buy each component inside the quotation marks in the corresponding row after href =. Follow the guide [here]([url](https://www.markdownguide.org/extended-syntax/)) to learn how to customize this to your project needs. 
@@ -474,7 +550,12 @@ Next, I will be moving on to my intensive project: the knee rehabilitation devic
 
 # Other Resources
 - [Cirkit Designer](https://app.cirkitdesigner.com/)
+- [ESP32 Wroom DevKit pinout](https://www.upesy.com/blogs/tutorials/esp32-pinout-reference-gpio-pins-ultimate-guide)
 - [Instructables](https://www.instructables.com/How-to-Make-FLEX-Sensor-at-Home-DIY-Flex-Sensor/)
 - [Wikipedia on Digital Biquad Filters](https://en.wikipedia.org/wiki/Digital_biquad_filter)
 - [Biquad Calculator](https://www.earlevel.com/main/2021/09/02/biquad-calculator-v3/)
 - [BU406 Transistor Data Sheet](https://www.onsemi.com/download/data-sheet/pdf/bu406-d.pdf)
+- [Simple Audio Amplifier Circut]([https://www.onsemi.com/download/data-sheet/pdf/bu406-d.pdf](https://www.instructables.com/Simple-Audio-Amplifier-Using-Single-Transistor/))
+- [Wikipedia on Operational Amplifiers](https://en.wikipedia.org/wiki/Operational_amplifier)
+- [Guide for NPN transistors](https://www.electronics-tutorials.ws/transistor/tran_2.html)
+- [Frequency and duration info for some popular songs](https://www.hibit.dev/posts/62/playing-popular-songs-with-arduino-and-a-buzzer)
