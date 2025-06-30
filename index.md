@@ -3,7 +3,7 @@ Replace this text with a brief description (2-3 sentences) of your project. This
 
 | **Engineer** | **School** | **Area of Interest** | **Grade** |
 |:--:|:--:|:--:|:--:|
-| Alika G | Woodside Priory | Engineering | Incoming Junior
+| Alika G | Woodside Priory | Electrical Engineering | Incoming Junior
 
 ![Headstone Image](logo.svg)
   
@@ -57,9 +57,15 @@ A biquad filter uses 6 coefficients: b<sub>0</sub>, b<sub>1</sub>, b<sub>2</sub>
   <img src="diagram.png" width="90%" height="90%">
 </div>
 
-> [!NOTE]
+> [NOTE]
 > I took all my data and did all my filtration after the linear regression, but since it is a linear regression, you can do it either way.
 
+## Speaker:
+I decided to add a speaker to my project to make the sound louder and smoother. To test this out, I made a circuit on the breadboard and some test code just for it. The schematic of the circuit is below. To wire this circuit, I needed a transistor, a capacitor, an ESP-32, in addition to the speaker. The resistor I used was a 2.2K ohm resistor, but you can vary the resistor depending on the desired volume. The way this works is the ESP has the ability to make perfect sinusoidal signals, so that signal is created and passed through the capacitor to filter out the constant. The capacitor acts as a filter, and similarly to taking the derivative of a sinusoidal function, is able to preserve the shape of the signal while removing the offset. The signal then goes to the base pin of the transistor. transistors 
+
+<div align="center">
+  <img src="SpeakerScematics.png" width="40%" height="40%">
+</div>
 
 # Second Milestone
 
@@ -471,3 +477,4 @@ Next, I will be moving on to my intensive project: the knee rehabilitation devic
 - [Instructables](https://www.instructables.com/How-to-Make-FLEX-Sensor-at-Home-DIY-Flex-Sensor/)
 - [Wikipedia on Digital Biquad Filters](https://en.wikipedia.org/wiki/Digital_biquad_filter)
 - [Biquad Calculator](https://www.earlevel.com/main/2021/09/02/biquad-calculator-v3/)
+- [BU406 Transistor Data Sheet](https://www.onsemi.com/download/data-sheet/pdf/bu406-d.pdf)
