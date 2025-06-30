@@ -554,7 +554,7 @@ Next, I will be moving on to my intensive project: the knee rehabilitation devic
 - [Wikipedia on Digital Biquad Filters](https://en.wikipedia.org/wiki/Digital_biquad_filter)
 - [Biquad Calculator](https://www.earlevel.com/main/2021/09/02/biquad-calculator-v3/)
 - [BU406 Transistor Data Sheet](https://www.onsemi.com/download/data-sheet/pdf/bu406-d.pdf)
-- [Simple Audio Amplifier Circut]([https://www.onsemi.com/download/data-sheet/pdf/bu406-d.pdf](https://www.instructables.com/Simple-Audio-Amplifier-Using-Single-Transistor/))
+- [Simple Audio Amplifier Circut](https://www.instructables.com/Simple-Audio-Amplifier-Using-Single-Transistor/)
 - [Wikipedia on Operational Amplifiers](https://en.wikipedia.org/wiki/Operational_amplifier)
 - [Guide for NPN transistors](https://www.electronics-tutorials.ws/transistor/tran_2.html)
 - [Frequency and duration info for some popular songs](https://www.hibit.dev/posts/62/playing-popular-songs-with-arduino-and-a-buzzer)
