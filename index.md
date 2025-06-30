@@ -59,6 +59,9 @@ A biquad filter uses 6 coefficients: b<sub>0</sub>, b<sub>1</sub>, b<sub>2</sub>
 
 > Note: I took all my data and did all my filtration after the linear regression, but since it is a linear regression, you can do it either way.
 
+## Vibration Motor:
+I wanted to create a silent mode that still provided the user with feedback, so I decided to use a vibration motor. There are multiple types of vibration motors, but the type that I chose is the most common. It is called an Eccentric Rotating Mass (ERM) vibration motor, and as the name suggests, it vibrates by rotating a mass. The mass is uneven, so as the mass is rotated at a fast speed, the motor moves in a vibrating motion. I used a coin or pancake-style motor, so unlike larger ERMs, you can't see the mass. This type of motor is often used for haptic feedback in small devices, like it is in mine.
+
 ## Speaker:
 I decided to add a speaker to my project to make the sound louder and smoother. To test this out, I made a circuit on the breadboard and some test code just for it. The schematic of the circuit is below. 
 <div align="center">
