@@ -57,14 +57,13 @@ A biquad filter uses 6 coefficients: b<sub>0</sub>, b<sub>1</sub>, b<sub>2</sub>
   <img src="diagram.png" width="90%" height="90%">
 </div>
 
-> ![NOTE]
-> I took all my data and did all my filtration after the linear regression, but since it is a linear regression, you can do it either way.
+> Note: I took all my data and did all my filtration after the linear regression, but since it is a linear regression, you can do it either way.
 
 ## Speaker:
 I decided to add a speaker to my project to make the sound louder and smoother. To test this out, I made a circuit on the breadboard and some test code just for it. The schematic of the circuit is below. 
-**<div align="center">
+<div align="center">
   <img src="SpeakerScematics.png" width="40%" height="40%">
-</div>**
+</div>
 
 To wire this circuit, I needed a transistor, a capacitor, an ESP-32, in addition to the speaker. The resistor I used was a 2.2K ohm resistor, but you can vary the resistor depending on the desired volume. The way this works is the ESP has the ability to make perfect sinusoidal signals, so that signal is created and passed through the capacitor to filter out the constant. The capacitor acts as a filter, and similarly to taking the derivative of a sinusoidal function, is able to preserve the shape of the signal while removing the offset. The signal then goes to the base pin of the transistor. Transistors have 3 pins: base, collector, and emitter. The base is like the gate that dictates the flow of current from the collector to the emitter. The base value is very small comparatively, as that is what is coming from the ESP's analog pin, rather than the current going through the speaker. The 5V power goes to the speaker directly and then exits to the transistor's collector pin. That then goes through the transistor to its emitter pin, ending at ground. There is also a feedback loop, where the base and collector pins are connected through a resistor, so the current from the collector pin is reduced by the resistor and fed back into the base pin, which "opens the gate" to a stable amount of current flow. 
 
