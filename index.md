@@ -57,7 +57,7 @@ A biquad filter uses 6 coefficients: b<sub>0</sub>, b<sub>1</sub>, b<sub>2</sub>
   <img src="diagram.png" width="90%" height="90%">
 </div>
 
-> [NOTE]
+> ![NOTE]
 > I took all my data and did all my filtration after the linear regression, but since it is a linear regression, you can do it either way.
 
 ## Speaker:
