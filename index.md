@@ -331,7 +331,7 @@ void setup() {
     Serial.println("6.66 KHz");
     break;
   }
-
+  // filling up the array so there are values that aren't 0 in all the spots 
   for (int i = 0; i < average; i++){
     flexvaluesarr[i] = analogRead(FlexPin);
   }
