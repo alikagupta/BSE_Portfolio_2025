@@ -349,10 +349,10 @@ void loop() {
     float accX;
     float accY;
     float accZ;
+    FlexValue = 0;
     byte topbuttonState = digitalRead(topbuttonPin);
 
-    soundVal = 1.19658*(analogRead(potPin))+100;
-    FlexValue = 0;
+    soundVal = 1.19658*(analogRead(potPin))+100;    // Converting the analog value of the potentiometer to a hertz value between 100 and 5000
 
     accX += accel.acceleration.x;
     accY += accel.acceleration.y;
