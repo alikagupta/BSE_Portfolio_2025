@@ -25,6 +25,9 @@ For your final milestone, explain the outcome of your project. Key details to in
 
 ## Flex Sensor:
 ![diagram of how a flex sensor works](Flexsensor.png)
+
+*Figure 1: Diagram of how a flex sensor's resistance changes from Aarav G's Instructables article (linked below)*
+
 A flex sensor is a variable resistor. When bent, the conductive particles spread apart, increasing the resistance as seen above. When reading in an Arduino it is important to use analogRead rather than the conventional digitalRead used for reading most Arduino inputs. analogRead reads the voltage along a scale, unlike digitalRead, which only returns high or low. Because we want to measure all the small changes in resistance, for a flex sensor, we need to use analogRead.
 
 ## Finding a resistor for the flex sensor:
@@ -41,26 +44,34 @@ While you can use a variety of resistors for a flex sensor, some will give you a
 
 ## Regression:
 
-After trying many types of regression, I ultimately went with a linear regression, which was pretty accurate for when the knee was 0 to 180 degrees, with less accuracy as you approach the end of that range. Regression means turning a scatter plot into an equation by finding the line of best fit. I did this on Desmos, as it lets you easily toggle between different types of regression. I wanted an R-squared value over 0.95 (R-squared is a metric to see how well the line of best fit fits the points), and I was only able to get that with linear, quadratic, or quartic regression. Quartic wasn't very helpful since I have too few points, so while it was hitting every point, the graph was a bit wonky. Quadratic was the clear best, but because quadratic functions aren't one-to-one, it was creating some difficulties. Linear was both accurate and what the flex sensors regression is supposed to be, between 0 and 180 degrees, according to documentation, so that's what I ended up using.
+I used regression to convert the flex sensor's raw value to degrees. After trying many types of regression, I ultimately went with a linear regression, which was pretty accurate for when the knee was 0 to 180 degrees, with less accuracy as you approach the end of that range. Regression means turning a scatter plot into an equation by finding the line of best fit. I did this on Desmos, as it lets you easily toggle between different types of regression. I wanted an R-squared value over 0.95 (R-squared is a metric to see how well the line of best fit fits the points), and I was only able to get that with linear, quadratic, or quartic regression. Quartic wasn't very helpful since I have too few points, so while it was hitting every point, the graph was a bit wonky. Quadratic was the clear best, but because quadratic functions aren't one-to-one, it was creating some difficulties. Linear was both accurate and what the flex sensors regression is supposed to be, between 0 and 180 degrees, according to documentation, so that's what I ended up using.
 
 ![Regression graph](LinearRegression.png)
 
+*Figure 3: Final graph of linear regression from Desmos*
+
 ## Digital Biquad Filter:
 
-In an effort to make my flex sensor data more consistent, I explored ways to create a low-pass filter. The goal of this is to push frequencies past a certain threshold to zero. The first step was recording the raw, unaveraged data from the flex sensor. I used a computer to plot a sample of this data when my knee was at 90° for a few seconds. This data was plotted in magnitude with respect to frequency, meaning it tells you what frequencies are represented in the data and how much of each frequency is there. This is the figure below:
+In an effort to make my flex sensor data more consistent, I explored ways to create a low-pass filter. The goal of this is to push frequencies past a certain threshold to zero. The first step was recording the raw, unaveraged data from the flex sensor. I used a discrete fourier transform (see MATLAB Code for the discrete Fourier transform in the appendix) to plot a sample of this data when my knee was at 90° for a few seconds. This data was plotted in magnitude with respect to frequency, meaning it tells you what frequencies are represented in the data and how much of each frequency is there. This is the figure below:
 <div align="center">
   <img src="plot.png" width="70%" height="70%">
 </div>
 
-Based on that graph, I decided the cutoff frequency should be 1 Hz. Deciding the cutoff is a tradeoff between getting rid of variability and still registering significant movements. I then used a computer to model what the filter looked like (see below) and find the right coefficients. 
+*Figure 4: Graph of magnitude of frequencies when holding my knee at 90°*
+
+Based on that graph, I decided the cutoff frequency should be 1 Hz. Deciding the cutoff is a tradeoff between getting rid of variability and still registering significant movements. After 1 Hz, there is a lot of noise (random spikes), and it isn't too low that it would cut off somewhat quick movements, so that seemed like an ideal starting cutoff. I also experimented with a 0.7 Hz cutoff. I then used a computer to model what the filter looked like (see below) and find the right coefficients. 
 <div align="center">
   <img src="filter.png" width="40%" height="40%">
 </div>
 
-A biquad filter uses 6 coefficients: b<sub>0</sub>, b<sub>1</sub>, b<sub>2</sub>, a<sub>0</sub>, a<sub>1</sub> and a<sub>2</sub>. The diagram below shows all the values that go into getting your output (y[n]) from your input (x[n]). In a biquad filter, you also store and use the past 2 input and output values. In the diagram, going back an iteration is represented with z<sup>-1</sup>. All the arrows in the diagram mean multiplication and the + symbols mean addition.
+*Figure 5: Graph of the biquad filter I used, generated by earlevel's biquad calculator*
+
+A biquad filter uses 6 coefficients: b<sub>0</sub>, b<sub>1</sub>, b<sub>2</sub>, a<sub>0</sub>, a<sub>1</sub> and a<sub>2</sub>. The diagram below shows all the values that go into getting your output (y[n]) from your input (x[n]). In a biquad filter, you also store and use the past 2 input and output values. In the diagram, going back an iteration is represented with z<sup>-1</sup>. All the arrows in the diagram mean multiplication, and the + symbols mean addition. see [Wikipedia on Digital Biquad Filters](https://en.wikipedia.org/wiki/Digital_biquad_filter) for a more indepth explaination.
 <div align="center">
   <img src="diagram.png" width="90%" height="90%">
 </div>
+
+*Figure 6: Flow chart of a biquad filter in direct form 1 from Wikipedia*
 
 > Note: I took all my data and did all my filtration after the linear regression, but since it is a linear regression, you can do it either way.
 
@@ -68,10 +79,12 @@ A biquad filter uses 6 coefficients: b<sub>0</sub>, b<sub>1</sub>, b<sub>2</sub>
 I wanted to create a silent mode that still provided the user with feedback, so I decided to use a vibration motor. There are multiple types of vibration motors, but the type that I chose is the most common. It is called an Eccentric Rotating Mass (ERM) vibration motor, and as the name suggests, it vibrates by rotating a mass. The mass is uneven, so as the mass is rotated at a fast speed, the motor moves in a vibrating motion. I used a coin or pancake-style motor, so unlike larger ERMs, you can't see the mass. This type of motor is often used for haptic feedback in small devices, like it is in mine.
 
 ## Speaker:
-I decided to add a speaker to my project to make the sound louder and smoother. To test this out, I made a circuit on the breadboard and some test code just for it. The schematic of the circuit is below. 
+I decided to add a speaker to my project to make the sound louder and smoother. To test this out, I made a circuit on the breadboard and some test code just for it (see Speaker Test Code in the appendix). The schematic of the circuit is below. 
 <div align="center">
   <img src="SpeakerScematics.png" width="40%" height="40%">
 </div>
+
+*Figure 7: schematic of my test circit for the speaker*
 
 To wire this circuit, I needed a transistor, a capacitor, an ESP-32, in addition to the speaker. The resistor I used was a 2.2K ohm resistor, but you can vary the resistor depending on the desired volume (with a resistance and volume having an inverse relationship). The way this works is the ESP has the ability to make perfect sinusoidal signals, so that signal is created and passed through the capacitor to filter out the constant. The capacitor acts as a filter, and similarly to taking the derivative of a sinusoidal function, is able to preserve the shape of the signal while removing the offset. The signal then goes to the base pin of the transistor. Transistors have 3 pins: base, collector, and emitter. The base is like the gate that dictates the flow of current from the collector to the emitter. The base value is very small comparatively, as that is what is coming from the ESP's analog pin, rather than the current going through the speaker. The 5V power goes to the speaker directly and then exits to the transistor's collector pin. That then goes through the transistor to its emitter pin, ending at ground. There is also a feedback loop, where the base and collector pins are connected through a resistor, so the current from the collector pin is reduced by the resistor and fed back into the base pin, which "opens the gate" to a stable amount of current flow. 
 
@@ -80,7 +93,7 @@ To wire this circuit, I needed a transistor, a capacitor, an ESP-32, in addition
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/kZ0Yr-viwl8?si=Qh_XLWgTdqZkQEg_" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-My second milestone consisted of attaching the device to a knee brace (in a temporary manner) and calibrating the threshold values for the sensors based on that. I also added averaging for the sensor data so it would be more consistent and precise. You can choose how many values to average in a moving average (right now it is set at 50). I was able to attach everything with rubber bands and took some time to find the best placement for the flex sensor, which I determined to be under the knee, since it was the most accurate. There weren't too many technical changes from the first milestone. I also added a button to change the threshold of the flex sensor, a power button, and a potentiometer that changes the frequency of the beeps. 
+My second milestone consisted of attaching the device to a knee brace (in a temporary manner) and calibrating the threshold values for the sensors based on that. I also added averaging for the sensor data so it would be more consistent and precise. You can choose how many values to average in a moving average (right now it is set at 50). I was able to attach everything with rubber bands and took some time to find the best placement for the flex sensor, which I determined to be under the knee, since it was the most accurate (see Second milestone code in appendix). There weren't too many technical changes from the first milestone. I also added a button to change the threshold of the flex sensor, a power button, and a potentiometer that changes the frequency of the beeps. 
 
 I had a lot of trouble with the regression for converting the flex sensor's raw value to degrees. I tried linear, quadratic, exponential, and logarithmic regressions. In the end I decided that the regression wouldn't work because only the quadratic regression had a pretty high R squared value (it was ~0.99 compared to the ~0.89 of the rest) and since quadratic equations aren't one-to-one, solving for x in terms of y gave me two seperate equations, which I couldn't put together in a peacewise function without it failing the vertical line test. I also tried flipping the x and y values, but then none of the regressions were accurate. Ultimately, I shifted that to a system with 4 pre-set flex sensor threshold levels, where the user could choose between them with a button. 
 
@@ -96,7 +109,7 @@ Next, I hope to get an accurate linear regression and use more advanced averagin
 
 My project is a knee rehabilitation device. It has two main sensors: an accelerometer and a flex sensor. An accelerometer keeps track of the static acceleration values, and the flex sensor uses variable resistance to measure the angle of bend. It uses these sensors to alert the user (with a beeper) if their knee is bending inwards or once it passes 90 degrees. 
 
-In my first milestone, I was able to put together the flex sensor, accelerometer, beeper, and ESP-32 Arduino with a breadboard. I was able to get data from the flex sensor and accelerometer, and code the buzzer to respond differently to both instruments crossing certain thresholds. I was then able to connect the data to my phone through Bluetooth so I can see the real-time values even when the device is connected to a battery pack.
+In my first milestone, I was able to put together the flex sensor, accelerometer, beeper, and ESP-32 Arduino with a breadboard. I was able to get data from the flex sensor and accelerometer, and code the buzzer to respond differently to both instruments crossing certain thresholds (see first milestone code in the appendix). I was then able to connect the data to my phone through Bluetooth so I can see the real-time values even when the device is connected to a battery pack.
 
 The main challenge that I faced in this step was getting the accelerometer to connect and send values to my computer. Originally, the accelerometer would just spit out various error codes and junk. In the end, there were a few issues with the initialization of the accelerometer object, which needed to be found in the library since there wasn't any documentation for it.
 
@@ -224,8 +237,8 @@ void loop() {
 
   //Check and Buzz if needed 
   if(accel.acceleration.z < 0){
-    tone(BuzzerPin, 1000);  
-  }  else if (FlexValue > 3200) {
+    tone(BuzzerPin, 1000);  // 1000 is the hertz it plays
+  }  else if (FlexValue > 3200) { // 3200 is the raw analog value of the flex sensor at about 90°
     tone(BuzzerPin, 200);  
     delay(200);
     tone(BuzzerPin, 0); 
@@ -460,6 +473,24 @@ void checkButtons(){
 }
 
 ```
+**MATLAB Code for the discrete Fourier transform:**
+```
+% Sampling frequency = 5Hz
+Fs = 5
+data = csvread('leg-sensor-data.csv');
+y = fft(data);
+% FFT gives two identical halves, so we take one half
+L = fix(length(y)/2)+1;
+% Truncate FFT data to half its original size
+y = 2*y(1:L);
+% Get a frequency scale for the X axis that ranges from 0 to Fs/2 Hz
+Frequency = (Fs/2)*linspace(0,1,L);
+plot(Frequency,20*log10(abs(y)/L))
+title('Magnitude of 90° Noise')
+xlabel('Frequency (Hz)')
+ylabel('Magnitude (dB)')
+```
+
 
 **Speaker Test Code (Hynm for the Weekend):**
 ```
