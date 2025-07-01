@@ -48,7 +48,9 @@ I used regression to convert the flex sensor's raw value to degrees. After tryin
 
 ![Regression graph](LinearRegression.png)
 
-<center> *Figure 3: Final graph of linear regression from Desmos* <center>
+<div align="center"> 
+  *Figure 3: Final graph of linear regression from Desmos* 
+</div>
 
 ## Digital Biquad Filter:
 
