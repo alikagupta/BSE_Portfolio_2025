@@ -87,7 +87,7 @@ Next, I hope to get an accurate linear regression and use more advanced averagin
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/xQuDBH7mC_g?si=Wa5gteVYbsMu8dR0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-My project is a knee rehabilitation device. It has two main sensors: an accelerometer and a flex sensor. An accelerometer keeps track of the static acceleration values with an internal mesh-like component, and the flex sensor uses variable resistance to measure the angle of bend. It uses these sensors to alert the user (with a beeper) if their knee is bending inwards or once it passes 90 degrees. 
+My project is a knee rehabilitation device. It has two main sensors: an accelerometer and a flex sensor. An accelerometer keeps track of the static acceleration values, and the flex sensor uses variable resistance to measure the angle of bend. It uses these sensors to alert the user (with a beeper) if their knee is bending inwards or once it passes 90 degrees. 
 
 In my first milestone, I was able to put together the flex sensor, accelerometer, beeper, and ESP-32 Arduino with a breadboard. I was able to get data from the flex sensor and accelerometer, and code the buzzer to respond differently to both instruments crossing certain thresholds. I was then able to connect the data to my phone through Bluetooth so I can see the real-time values even when the device is connected to a battery pack.
 
