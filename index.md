@@ -101,7 +101,7 @@ I decided to add a speaker to my project to make the sound louder and smoother. 
 
 <div align="center"> 
   
-  *Figure 7: schematic of my test circit for the speaker* 
+  *Figure 7: schematic of my test circuit for the speaker, made on Cirkit designer* 
 </div>
 
 To wire this circuit, I needed a transistor, a capacitor, an ESP-32, in addition to the speaker. The resistor I used was a 2.2K ohm resistor, but you can vary the resistor depending on the desired volume (with a resistance and volume having an inverse relationship). The way this works is the ESP has the ability to make perfect sinusoidal signals, so that signal is created and passed through the capacitor to filter out the constant. The capacitor acts as a filter, and similarly to taking the derivative of a sinusoidal function, is able to preserve the shape of the signal while removing the offset. The signal then goes to the base pin of the transistor. Transistors have 3 pins: base, collector, and emitter. The base is like the gate that dictates the flow of current from the collector to the emitter. The base value is very small comparatively, as that is what is coming from the ESP's analog pin, rather than the current going through the speaker. The 5V power goes to the speaker directly and then exits to the transistor's collector pin. That then goes through the transistor to its emitter pin, ending at ground. There is also a feedback loop, where the base and collector pins are connected through a resistor, so the current from the collector pin is reduced by the resistor and fed back into the base pin, which "opens the gate" to a stable amount of current flow. 
@@ -120,7 +120,7 @@ Next, I hope to get an accurate linear regression and use more advanced averagin
 ![picture of circuit](Milestone2Shem.png)
 <div align="center"> 
   
-  *Figure _: A schematic of my circuitry at milestone 2*
+  *Figure _: A schematic of my circuitry at milestone 2, made on Cirkit designer*
 </div>
 
 # First Milestone
@@ -138,7 +138,7 @@ Next, I hope to place all of this onto the knee compression sleeve and change th
 ![picture of circuit](MileStone1Shem.png)
 <div align="center"> 
   
-  *Figure _: A schematic of my circuitry at milestone 1*
+  *Figure _: A schematic of my circuitry at milestone 1, made on Cirkit designer*
 </div>
 
 # Code
