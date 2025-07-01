@@ -21,7 +21,7 @@ For your final milestone, explain the outcome of your project. Key details to in
 
 
 -->
-# How it works
+# How the components works
 
 ## Flex Sensor:
 ![diagram of how a flex sensor works](Flexsensor.png)
