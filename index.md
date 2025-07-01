@@ -33,7 +33,7 @@ While you can use a variety of resistors for a flex sensor, some will give you a
 
 <div align="center">
   <img src="risitorGraph.png" width="40%" height="40%" alt="Graph of resistor values against range">
-  <figcaption> Figure 2: A graph from Desmos of resistor values (x-axis) against the range of analog flex sensor values that resistor would allow</figcaption>
+  <figcaption> Figure 2: A graph from Desmos of resistor values (x-axis) against the range of analog flex sensor values that the resistor would allow</figcaption>
 </div>
 
 ## Regression:
