@@ -25,7 +25,7 @@ For your final milestone, explain the outcome of your project. Key details to in
 
 ## Flex Sensor:
 ![diagram of how a flex sensor works](Flexsensor.png)
-A flex sensor is a variable resistor. When bent, the conductive particles spread apart, increasing the resistance as seen above. 
+A flex sensor is a variable resistor. When bent, the conductive particles spread apart, increasing the resistance as seen above. When reading in an Arduino it is important to use analogRead rather than the conventional digitalRead used for reading most Arduino inputs. analogRead reads the voltage along a scale, unlike digitalRead, which only returns high or low. Because we want to measure all the small changes in resistance, for a flex sensor, we need to use analogRead.
 
 ## Finding a resistor for the flex sensor:
 
@@ -68,8 +68,7 @@ I decided to add a speaker to my project to make the sound louder and smoother. 
   <img src="SpeakerScematics.png" width="40%" height="40%">
 </div>
 
-To wire this circuit, I needed a transistor, a capacitor, an ESP-32, in addition to the speaker. The resistor I used was a 2.2K ohm resistor, but you can vary the resistor depending on the desired volume. The way this works is the ESP has the ability to make perfect sinusoidal signals, so that signal is created and passed through the capacitor to filter out the constant. The capacitor acts as a filter, and similarly to taking the derivative of a sinusoidal function, is able to preserve the shape of the signal while removing the offset. The signal then goes to the base pin of the transistor. Transistors have 3 pins: base, collector, and emitter. The base is like the gate that dictates the flow of current from the collector to the emitter. The base value is very small comparatively, as that is what is coming from the ESP's analog pin, rather than the current going through the speaker. The 5V power goes to the speaker directly and then exits to the transistor's collector pin. That then goes through the transistor to its emitter pin, ending at ground. There is also a feedback loop, where the base and collector pins are connected through a resistor, so the current from the collector pin is reduced by the resistor and fed back into the base pin, which "opens the gate" to a stable amount of current flow. 
-
+To wire this circuit, I needed a transistor, a capacitor, an ESP-32, in addition to the speaker. The resistor I used was a 2.2K ohm resistor, but you can vary the resistor depending on the desired volume (with a resistance and volume having an inverse relationship). The way this works is the ESP has the ability to make perfect sinusoidal signals, so that signal is created and passed through the capacitor to filter out the constant. The capacitor acts as a filter, and similarly to taking the derivative of a sinusoidal function, is able to preserve the shape of the signal while removing the offset. The signal then goes to the base pin of the transistor. Transistors have 3 pins: base, collector, and emitter. The base is like the gate that dictates the flow of current from the collector to the emitter. The base value is very small comparatively, as that is what is coming from the ESP's analog pin, rather than the current going through the speaker. The 5V power goes to the speaker directly and then exits to the transistor's collector pin. That then goes through the transistor to its emitter pin, ending at ground. There is also a feedback loop, where the base and collector pins are connected through a resistor, so the current from the collector pin is reduced by the resistor and fed back into the base pin, which "opens the gate" to a stable amount of current flow. 
 
 
 # Second Milestone
@@ -81,6 +80,9 @@ My second milestone consisted of attaching the device to a knee brace (in a temp
 I had a lot of trouble with the regression for converting the flex sensor's raw value to degrees. I tried linear, quadratic, exponential, and logarithmic regressions. In the end I decided that the regression wouldn't work because only the quadratic regression had a pretty high R squared value (it was ~0.99 compared to the ~0.89 of the rest) and since quadratic equations aren't one-to-one, solving for x in terms of y gave me two seperate equations, which I couldn't put together in a peacewise function without it failing the vertical line test. I also tried flipping the x and y values, but then none of the regressions were accurate. Ultimately, I shifted that to a system with 4 pre-set flex sensor threshold levels, where the user could choose between them with a button. 
 
 Next, I hope to get an accurate linear regression and use more advanced averaging or filtering techniques to get more consistent data. I also hope to incorporate more of a user interface-starting with buttons and later potentially having the user be able to input commands from their phones to the device. For example, for the flex sensor threshold levels, right now they are controlled with a button that just cycles through 4 preset values but hopefuly I can make it so in the bluetooth monitor the user can type in something like "Angle threshold: 75" and that would set the device to beep when the knee is at 75 degrees. Overall, my next steps are going to focus on modifications as the base part of my project is done. My 3rd milestone will be sewing and soldering everything, so I want to finish all the additional circuitry or parts my modifications might need before then.
+
+![picture of circuit](Milestone2Shem.png)
+*Here is a schematic of my circuitry at milestone 2*
 
 
 # First Milestone
@@ -95,12 +97,8 @@ The main challenge that I faced in this step was getting the accelerometer to co
 
 Next, I hope to place all of this onto the knee compression sleeve and change the thresholds for the flex sensor and accelerometer so the beeping is as precise as possible. I hope to perform linear regression to get the values of the angles from the flex sensor instead of just the regular flex sensor output, which is usually in the 1000s. How I place the accelerometer will also define what the if statement for when the knee is turning inward looks like.
 
-# Schematics 
-**First Milestone:**
-![picture of circuit](Milestone1_circut.png)
-
-**Second Milestone:**
-![picture of circuit](Milestone2Scems.png)
+![picture of circuit](Milestone1Shem.png)
+*Here is a schematic of my circuitry at milestone 1*
 
 # Code
 **First Milestone:**
@@ -128,7 +126,7 @@ void setup() {
   pinMode(FlexPin, INPUT);
   pinMode(BuzzerPin, OUTPUT);
 
-  //Accelerometer set up
+  //Accelerometer set up -- code from adafruit_LSM6DS33_test example from Adafruit LSM6DS library, to access examples go to file then examples and then select the right library and test
   lsm6ds33.begin_I2C ();
   Serial.print("Accelerometer range set to: ");
   switch (lsm6ds33.getAccelRange()) {
@@ -278,7 +276,7 @@ void setup() {
   pinMode(powerbuttonPin, INPUT_PULLUP);
 
 
-  //Accelerometer set up
+  //Accelerometer set up -- code from adafruit_LSM6DS33_test example from Adafruit LSM6DS library, to access examples go to file then examples and then select the right library and test
   lsm6ds33.begin_I2C ();
   Serial.print("Accelerometer range set to: ");
   switch (lsm6ds33.getAccelRange()) {
