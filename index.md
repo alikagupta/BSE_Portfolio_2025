@@ -99,6 +99,9 @@ Next, I hope to place all of this onto the knee compression sleeve and change th
 **First Milestone:**
 ![picture of circuit](Milestone1_circut.png)
 
+**Second Milestone:**
+![picture of circuit](Milestone2Scems.png)
+
 # Code
 Here's where you'll put your code. The syntax below places it into a block of code. Follow the guide [here]([url](https://www.markdownguide.org/extended-syntax/)) to learn how to customize it to your project needs. 
 
