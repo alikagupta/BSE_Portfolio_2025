@@ -97,7 +97,7 @@ The main challenge that I faced in this step was getting the accelerometer to co
 
 Next, I hope to place all of this onto the knee compression sleeve and change the thresholds for the flex sensor and accelerometer so the beeping is as precise as possible. I hope to perform linear regression to get the values of the angles from the flex sensor instead of just the regular flex sensor output, which is usually in the 1000s. How I place the accelerometer will also define what the if statement for when the knee is turning inward looks like.
 
-![picture of circuit](Milestone1Shem.png)
+![picture of circuit](MileStone1Shem.png)
 *Here is a schematic of my circuitry at milestone 1*
 
 # Code
