@@ -618,6 +618,33 @@ void loop() {
 }
 ```
 
+**Neopixel Strip Test Code:**
+```
+#include <Adafruit_NeoPixel.h>
+
+const int LEDpin = 32;
+const int NumPixels = 25;
+
+Adafruit_NeoPixel strip(NumPixels, LEDpin, NEO_GRB + NEO_KHZ800); 
+
+void setup() {
+  strip.begin();
+  strip.show(); 
+}
+
+void loop() {
+  colorWipe(strip.Color(0, 70, 92), 50); // blue
+  colorWipe(strip.Color(3, 66, 0), 50);  // green
+}
+
+void colorWipe(uint32_t color, int wait) { // makes the strip turn color with a delay of wait miliseconds between when each light switches
+  for (int i = 0; i < strip.numPixels(); i++) {
+    strip.setPixelColor(i, color);
+    strip.show();
+    delay(wait);
+  }
+}
+```
 
 
 <!-- # Bill of Materials
