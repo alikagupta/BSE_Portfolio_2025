@@ -619,3 +619,5 @@ Next, I will be moving on to my intensive project: the knee rehabilitation devic
 - [Wikipedia on Operational Amplifiers](https://en.wikipedia.org/wiki/Operational_amplifier)
 - [Guide for NPN transistors](https://www.electronics-tutorials.ws/transistor/tran_2.html)
 - [Frequency and duration info for some popular songs](https://www.hibit.dev/posts/62/playing-popular-songs-with-arduino-and-a-buzzer)
+- [Guide on parallel multitasking on a esp-23 with FreeRTOS](https://www.circuitstate.com/tutorials/how-to-write-parallel-multitasking-applications-for-esp32-using-freertos-arduino/)
+- 
