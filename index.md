@@ -40,7 +40,7 @@ While you can use a variety of resistors for a flex sensor, some will give you a
 
 <div align="center"> 
   
-  *Figure 2: A graph from Desmos of resistor values (x-axis) against the range of analog flex sensor values that the resistor would allow*
+  _Figure 2: A graph from Desmos of resistor values (x-axis) against the range of analog flex sensor values that the resistor would allow_
 </div>
 
 
@@ -53,7 +53,7 @@ I used regression to convert the flex sensor's raw value to degrees. After tryin
 
 <div align="center"> 
   
-  *Figure 3: Final graph of linear regression from Desmos* 
+  _Figure 3: Final graph of linear regression from Desmos_
 </div>
 
 ## Digital Biquad Filter:
