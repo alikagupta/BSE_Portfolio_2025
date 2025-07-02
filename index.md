@@ -65,7 +65,7 @@ In an effort to make my flex sensor data more consistent, I explored ways to cre
 
 <div align="center"> 
   
-  *Figure 4: Graph of magnitude of frequencies when holding my knee at 90°, generated with MATLAB* 
+  <i>Figure 4: Graph of magnitude of frequencies when holding my knee at 90°, generated with MATLAB*</i>
 </div>
 
 Based on that graph, I decided the cutoff frequency should be 1 Hz. Deciding the cutoff is a tradeoff between getting rid of variability and still registering significant movements. After 1 Hz, there is a lot of noise (random spikes), and it isn't too low that it would cut off somewhat quick movements, so that seemed like an ideal starting cutoff. I also experimented with a 0.7 Hz cutoff. I then used a computer to model what the filter looked like (Figure 5) and find the right coefficients. 
