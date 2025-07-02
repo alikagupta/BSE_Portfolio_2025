@@ -104,7 +104,21 @@ I decided to add a speaker to my project to make the sound louder and smoother. 
   *Figure 7: schematic of my test circuit for the speaker, made on Cirkit designer* 
 </div>
 
-To wire this circuit, I needed a transistor, a capacitor, an ESP-32, in addition to the speaker. The resistor I used was a 2.2K ohm resistor, but you can vary the resistor depending on the desired volume (with a resistance and volume having an inverse relationship). The way this works is the ESP has the ability to make perfect sinusoidal signals, so that signal is created and passed through the capacitor to filter out the constant. The capacitor acts as a filter, and similarly to taking the derivative of a sinusoidal function, is able to preserve the shape of the signal while removing the offset. The signal then goes to the base pin of the transistor. Transistors have 3 pins: base, collector, and emitter. The base is like the gate that dictates the flow of current from the collector to the emitter. The base value is very small comparatively, as that is what is coming from the ESP's analog pin, rather than the current going through the speaker. The 5V power goes to the speaker directly and then exits to the transistor's collector pin. That then goes through the transistor to its emitter pin, ending at ground. There is also a feedback loop, where the base and collector pins are connected through a resistor, so the current from the collector pin is reduced by the resistor and fed back into the base pin, which "opens the gate" to a stable amount of current flow. 
+To wire this circuit, I needed a transistor, a capacitor, an ESP-32, in addition to the speaker. The resistor I used was a 2.2K ohm resistor, but you can vary the resistor depending on the desired volume (with a resistance and volume having an inverse relationship). The way this works is the ESP has the ability to make perfect sinusoidal signals, so that signal is created and passed through the capacitor to filter out the constant. The capacitor acts as a filter, and similarly to taking the derivative of a sinusoidal function, is able to preserve the shape of the signal while removing the offset. The signal then goes to the base pin of the transistor. Transistors have 3 pins: base, collector, and emitter. The base is like the gate that dictates the flow of current from the collector to the emitter. The base value is very small comparatively, as that is what is coming from the ESP's analog pin, rather than the current going through the speaker. The 5V power goes to the speaker directly and then exits to the transistor's collector pin. That then goes through the transistor to its emitter pin, ending at ground. There is also a feedback loop, where the base and collector pins are connected through a resistor, so the current from the collector pin is reduced by the resistor and fed back into the base pin, which "opens the gate" to a stable amount of current flow.
+
+## Running two loops concurrently:
+I wanted to run two loops in true parallel (not just switching between them really fast), so my normal code could run while the speaker played music, which is called multitasking. To do this, I used FreeRTOS(free real-time operating system) in the regular Arduino IDE. More technically, multitasking means you create 2 independent tasks and then run them on the same or different cores. Lucky for me, ESP-32s have 2 cores: core 0 and core 1. My first step was figuring out what core my code was currently running on. To do this, I added `Serial.println(xPortGetCoreID());` to the end of the main loop. This told me that my knee rehab code was running on core 1 (which is the default for Bluetooth, which I use). Next I created my task as seen below:
+
+```
+void SpeakerLoop(void* pvParameters){ 
+  while(true){
+    // actual code for the task (what would be in void loop(){ here } ordinarily)
+  }
+}
+```
+The formatting for this second task is a bit different than Arduino's default void loop(): first, the name has to be different to distinguish it from the main loop; second, you need to have the parameter void* pvParameters because it is passing in a address and FreeRTOS reguires it even if it is null; and lastly we need a while(true) loop because otherwise the task will just finish once it reaches the end of the code. It is also important to note that while this is written like a function, if we want to use it as a task, it HAS to have void as the return type and a void* for a parameter.
+
+
 
 
 # Second Milestone
