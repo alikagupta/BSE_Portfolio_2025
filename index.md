@@ -138,6 +138,8 @@ The first two parameters are pretty straightforward. The stack size is how much 
 ## Creating your own library:
 I wanted to keep my code cleaner, so when I realized I would need huge arrays of the notes and durations of each note for every song I wanted the user to be able to play, I decided to make my own music library. The way libraries work in C++ is that they are effectively just pasted in, so the code is pretty much the same. I created a file on TextEdit and then converted it from .rtf (rich text format) to .h (header). IMPORTANT: when converting your .h file will look the same, but when you actually open up the code of it, there  will be random remnants from rtf trying to tell you the lost information, just delete that, otherwise it will throw errors. Then just drag the file into the folder of the project you are working in (in Documents/Arduino) next to the .ino file. In your .ino (regular code) file, include the name of your library, in my case `#include "Music.h"`. Then you are free to code in your library, just remember that it needs to be able to compile by itself, so if you are adding functions, you might need to pass in pointers. To pass a pointer to a function, put &variableName, because, unlike Java, if you just put the name of the variable, it is not a pointer but the information (rvalues) of the object. To declare an input parameter a pointer for something, put variableType *variableName. 
 
+## Neopixel Strip:
+A Neopixel strip is just a bunch of Neopixels chained together. Each Neopixel has a red LED, green LED, and blue LED that shine at different brightnesses to make a rainbow of colors. Each Neopixel receives 3 bytes of information (8 bits for each color) on its data pin and gets 5V from its power pin, with its last pin being ground. These pins of each Neopixel are attached together in a Neopixel strip. You just need to connect the wires from the neopixel at the start end, with power to the ESP-32's Vin, ground to ground, and the data pin to one of the digital pins on the ESP-32. I then tested the strip with some basic code (see Neopixel Strip Test Code in the appendix) before integrating it into my project. 
 
 # Second Milestone
 
@@ -541,6 +543,7 @@ y = 2*y(1:L);
 % Get a frequency scale for the X axis that ranges from 0 to Fs/2 Hz
 Frequency = (Fs/2)*linspace(0,1,L);
 plot(Frequency,20*log10(abs(y)/L))
+% labeling the graph
 title('Magnitude of 90° Noise')
 xlabel('Frequency (Hz)')
 ylabel('Magnitude (dB)')
@@ -554,11 +557,12 @@ ylabel('Magnitude (dB)')
 #include "DacESP32.h"
 #include "pitches.h"
 
-#define SPEAKER_PIN 25 // pin for speaker (25 is an anolog and digital pin)
-DacESP32 dac1(25); // Creating speaker object
+#define SPEAKER_PIN 25                       // pin for speaker (25 is an anolog and digital pin)
+DacESP32 dac1(25);                           // Creating speaker object
 
 // song info for Coldplay's Hymn for the weekend -- Credit to  HiBit <https://www.hibit.dev>
-int melody[] = { // notes preset into frequecies in the pitches library
+
+int melody[] = {                             // notes preset into frequecies in the pitches library
   NOTE_GS4, NOTE_GS4, NOTE_GS4, NOTE_G4, NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4,
   NOTE_G4, NOTE_G4, NOTE_G4, NOTE_G4, NOTE_G4, NOTE_G4,NOTE_F4,NOTE_F4,
   NOTE_GS4, NOTE_GS4, NOTE_GS4, NOTE_G4, NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4,
@@ -579,7 +583,7 @@ int melody[] = { // notes preset into frequecies in the pitches library
   NOTE_AS4, NOTE_C5, NOTE_AS5, NOTE_GS5, NOTE_G5, NOTE_G5,
 };
 
-int durations[] = { //notes are the types so like 4 is a quarter note
+int durations[] = {                          //notes are the types so like 4 is a quarter note
   4, 4, 4, 4, 4, 4, 4, 4,
   4, 4, 4, 4, 4, 4, 4, 4,
   4, 4, 4, 4, 4, 4, 4, 4,
@@ -609,8 +613,8 @@ void loop() {
 
   for (int note = 0; note < size; note++) {
     int duration = 1000 / durations[note];
-    dac1.outputCW(melody[note]); // getting note from array
-    delay(duration); // note duration 
+    dac1.outputCW(melody[note]);             // getting note from array
+    delay(duration);                         // note duration 
     int pauseBetweenNotes = duration * 0.30; // pause so you can really hear the notes better
     delay(pauseBetweenNotes);
     dac1.outputCW(0);
@@ -620,24 +624,25 @@ void loop() {
 
 **Neopixel Strip Test Code:**
 ```
-#include <Adafruit_NeoPixel.h>
+#include <Adafruit_NeoPixel.h>                                     // Needed library 
 
+// NeoPixel info varibles 
 const int LEDpin = 32;
 const int NumPixels = 25;
 
-Adafruit_NeoPixel strip(NumPixels, LEDpin, NEO_GRB + NEO_KHZ800); 
+Adafruit_NeoPixel strip(NumPixels, LEDpin, NEO_GRB + NEO_KHZ800); // sets up neopixel strip object 
 
 void setup() {
-  strip.begin();
-  strip.show(); 
+  strip.begin();                                                  // initializes strip
+  strip.show();                                                   // makes it show as blank
 }
 
 void loop() {
-  colorWipe(strip.Color(0, 70, 92), 50); // blue
-  colorWipe(strip.Color(3, 66, 0), 50);  // green
+  colorWipe(strip.Color(0, 70, 92), 50);                           // blue-ish
+  colorWipe(strip.Color(3, 66, 0), 50);                            // green
 }
 
-void colorWipe(uint32_t color, int wait) { // makes the strip turn color with a delay of wait miliseconds between when each light switches
+void colorWipe(uint32_t color, int wait) {                          // makes the strip turn color with a delay of wait milliseconds between when each light switches
   for (int i = 0; i < strip.numPixels(); i++) {
     strip.setPixelColor(i, color);
     strip.show();
