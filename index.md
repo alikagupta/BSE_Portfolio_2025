@@ -48,8 +48,6 @@ While you can use a variety of resistors for a flex sensor, some will give you a
   <i>Figure 2: A graph from Desmos of resistor values (x-axis) against the range of analog flex sensor values that the resistor would allow</i>
 </div>
 
-
-
 ## Regression:
 
 I used regression to convert the flex sensor's raw value to degrees. After trying many types of regression, I ultimately went with a linear regression, which was pretty accurate for when the knee was 0 to 180 degrees, with less accuracy as you approach the end of that range. Regression means turning a scatter plot into an equation by finding the line of best fit. I did this on Desmos, as it lets you easily toggle between different types of regression. I wanted an R-squared value over 0.95 (R-squared is a metric to see how well the line of best fit fits the points), and I was only able to get that with linear, quadratic, or quartic regression. Quartic wasn't very helpful since I have too few points, so while it was hitting every point, the graph was a bit wonky. Quadratic was the clear best, but because quadratic functions aren't one-to-one, it was creating some difficulties. Linear was both accurate and what the flex sensors regression is supposed to be, between 0 and 180 degrees, according to documentation, so that's what I ended up using (Figure 3).
@@ -94,6 +92,9 @@ A biquad filter uses 6 coefficients: b<sub>0</sub>, b<sub>1</sub>, b<sub>2</sub>
 </div>
 
 > Note: I took all my data and did all my filtration after the linear regression, but since it is a linear regression, you can do it either way.
+
+## Piezo Buzzers:
+Piezoelectric Buzzers work by rapidly vibrating a disc of piezoelectric material at a high frequency. Piezoelectric just means it changes shape when electricity is applied to it.
 
 ## Vibration Motor:
 I wanted to create a silent mode that still provided the user with feedback, so I decided to use a vibration motor. There are multiple types of vibration motors, but the type that I chose is the most common. It is called an Eccentric Rotating Mass (ERM) vibration motor, and as the name suggests, it vibrates by rotating a mass. The mass is uneven, so as the mass is rotated at a fast speed, the motor moves in a vibrating motion. I used a coin or pancake-style motor, so unlike larger ERMs, you can't see the mass, but you can see Figure 7 for the structure under the cap. This type of motor is often used for haptic feedback in small devices, like it is in mine.
