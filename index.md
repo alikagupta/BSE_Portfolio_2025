@@ -124,13 +124,13 @@ The formatting for this second task is a bit different than Arduino's default `v
 Next, we want to take this SpeakerLoop function and make it a task pinned to the core not in use (in this case, core 0). The code below (placed in setup) accomplishes that.
 ```
   xTaskCreatePinnedToCore (
-    SpeakerLoop, // Function to implement the task
-    "MusicTask", // Name of the task
-    4096, // Stack size in bytes
-    NULL, // Task input parameter
-    0, // Priority of the task
-    NULL, // Task handle
-    0 // Core where the task should run
+    SpeakerLoop,     // Function to implement the task
+    "MusicTask",     // Name of the task
+    4096,            // Stack size in bytes
+    NULL,            // Task input parameter
+    0,               // Priority of the task
+    NULL,            // Task handle
+    0                // Core where the task should run
   );
 ```
 The first two parameters are pretty straightforward. The stack size is how much space/memory you are giving to the task. All the variables specific to that task will be put "on top of the stack" (or actually bottom because stacks build down). The return addresses or functions, and various other things, also go on the stacks. What I did to choose the size was to start small and then just increase the size until I wasn't getting stack overflow or stack canary errors. It is convention to use powers of 2 for the bytes (a byte is just 8 bits) that you specify. The next line is the pointer parameter we are passing in (the void* pvParameters from earlier), but since I'm not using it, I just put NULL. Priority tells the computer that if it has a conflict between two tasks, which one to choose. 0 is the highest priority. The priority doesn't matter too much in this case because the two tasks aren't really interacting, they are running on different cores, and neither will be that problematic if they are delayed by a very small amount of time. The task handle is the pointer (points directly to the address) or handle (an abstract reference managed by a separate system) for the task it is creating. I didn't need one, so I just put NULL. Finally, it needs the number of the core I am pinning it to, which is 0. If you want more information on this, I recommend looking at [How to Write Parallel Multitasking Applications for ESP32 using FreeRTOS & Arduino.](https://www.circuitstate.com/tutorials/how-to-write-parallel-multitasking-applications-for-esp32-using-freertos-arduino/). Also, an important thing to remember is you need to add the volatile keyword before any variable accessed by multiple tasks/cores. In general you want to have as little information as possible accessible to both, so I'm only having a boolean and a byte (instead of an int because ints are 4 bytes).
