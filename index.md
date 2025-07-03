@@ -153,7 +153,7 @@ I had a lot of trouble with the regression for converting the flex sensor's raw 
 
 Next, I hope to get an accurate linear regression and use more advanced averaging or filtering techniques to get more consistent data. I also hope to incorporate more of a user interface-starting with buttons and later potentially having the user be able to input commands from their phones to the device. For example, for the flex sensor threshold levels, right now they are controlled with a button that just cycles through 4 preset values but hopefuly I can make it so in the bluetooth monitor the user can type in something like "Angle threshold: 75" and that would set the device to beep when the knee is at 75 degrees. Overall, my next steps are going to focus on modifications as the base part of my project is done. My 3rd milestone will be sewing and soldering everything, so I want to finish all the additional circuitry or parts my modifications might need before then.
 
-![picture of circuit](Milestone2Shem.png)
+![picture of circuit](Milestone2shem.png)
 <div align="center"> 
   
   <i>Figure _: A schematic of my circuitry at milestone 2, made on Cirkit designer</i>
@@ -171,7 +171,7 @@ The main challenge that I faced in this step was getting the accelerometer to co
 
 Next, I hope to place all of this onto the knee compression sleeve and change the thresholds for the flex sensor and accelerometer so the beeping is as precise as possible. I hope to perform linear regression to get the values of the angles from the flex sensor instead of just the regular flex sensor output, which is usually in the 1000s. How I place the accelerometer will also define what the if statement for when the knee is turning inward looks like.
 
-![picture of circuit](MileStone1Shem.png)
+![picture of circuit](Milestone1Shema.png)
 <div align="center"> 
   
   <i>Figure _: A schematic of my circuitry at milestone 1, made on Cirkit designer</i>
