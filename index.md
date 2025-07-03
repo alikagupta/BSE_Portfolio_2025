@@ -325,7 +325,7 @@ BleSerial ble;
 
 // user can update variables 
 const int average = 50;
-int AngleDangerLevel = 1; // 4 = 75, 3 = 90, 2 = 120, 1 = 135
+int AngleDangerLevel = 1;                             // 4 = 75, 3 = 90, 2 = 120, 1 = 135
 int soundVal = 1000;
 
 // delaring and initializing variables
