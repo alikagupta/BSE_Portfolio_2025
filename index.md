@@ -96,17 +96,25 @@ A biquad filter uses 6 coefficients: b<sub>0</sub>, b<sub>1</sub>, b<sub>2</sub>
 > Note: I took all my data and did all my filtration after the linear regression, but since it is a linear regression, you can do it either way.
 
 ## Vibration Motor:
-I wanted to create a silent mode that still provided the user with feedback, so I decided to use a vibration motor. There are multiple types of vibration motors, but the type that I chose is the most common. It is called an Eccentric Rotating Mass (ERM) vibration motor, and as the name suggests, it vibrates by rotating a mass. The mass is uneven, so as the mass is rotated at a fast speed, the motor moves in a vibrating motion. I used a coin or pancake-style motor, so unlike larger ERMs, you can't see the mass. This type of motor is often used for haptic feedback in small devices, like it is in mine.
+I wanted to create a silent mode that still provided the user with feedback, so I decided to use a vibration motor. There are multiple types of vibration motors, but the type that I chose is the most common. It is called an Eccentric Rotating Mass (ERM) vibration motor, and as the name suggests, it vibrates by rotating a mass. The mass is uneven, so as the mass is rotated at a fast speed, the motor moves in a vibrating motion. I used a coin or pancake-style motor, so unlike larger ERMs, you can't see the mass, but you can see Figure 7 for the structure under the cap. This type of motor is often used for haptic feedback in small devices, like it is in mine.
+<div align="center">
+  <img src="ERM.png" width="50%" height="50%">
+</div>
+
+<div align="center"> 
+  
+  <i>Figure 7: The structure of a coin ERM motor from [I need motors](https://www.ineedmotors.com/vibration-motor/coin-vibration-motor/worlds-smallest-erm-motor.html) modified on Canva</i>
+</div>
 
 ## Speaker:
-I decided to add a speaker to my project to make the sound louder and smoother. To test this out, I made a circuit on the breadboard (Figure 7) and some test code just for it (see Speaker Test Code in the appendix).
+I decided to add a speaker to my project to make the sound louder and smoother. To test this out, I made a circuit on the breadboard (Figure 8) and some test code just for it (see Speaker Test Code in the appendix).
 <div align="center">
   <img src="SpeakerScematics.png" width="40%" height="40%">
 </div>
 
 <div align="center"> 
   
-  <i>Figure 7: schematic of my test circuit for the speaker, made on Cirkit designer</i>
+  <i>Figure 8: schematic of my test circuit for the speaker, made on Cirkit designer</i>
 </div>
 
 To wire this circuit, I needed a transistor, a capacitor, an ESP-32, in addition to the speaker. The resistor I used was a 2.2K ohm resistor, but you can vary the resistor depending on the desired volume (with a resistance and volume having an inverse relationship). The way this works is the ESP has the ability to make perfect sinusoidal signals, so that signal is created and passed through the capacitor to filter out the constant. The capacitor acts as a filter, and similarly to taking the derivative of a sinusoidal function, is able to preserve the shape of the signal while removing the offset. The signal then goes to the base pin of the transistor. Transistors have 3 pins: base, collector, and emitter. The base is like the gate that dictates the flow of current from the collector to the emitter. The base value is very small comparatively, as that is what is coming from the ESP's analog pin, rather than the current going through the speaker. The 5V power goes to the speaker directly and then exits to the transistor's collector pin. That then goes through the transistor to its emitter pin, ending at ground. There is also a feedback loop, where the base and collector pins are connected through a resistor, so the current from the collector pin is reduced by the resistor and fed back into the base pin, which "opens the gate" to a stable amount of current flow.
