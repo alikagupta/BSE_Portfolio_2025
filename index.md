@@ -186,7 +186,7 @@ Next, I hope to place all of this onto the knee compression sleeve and change th
   <i>Figure _: A schematic of my circuitry at milestone 1, made on Cirkit designer</i>
 </div>
 
-# Appendix: Code
+# Appendix A: Code
 **First Milestone:**
 ```
 //adding needed libraries
