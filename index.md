@@ -189,7 +189,7 @@ Adafruit_LSM6DS33 lsm6ds33 {};
 BleSerial ble;
 
 
-// delaring and initializing variables
+// declaring and initializing variables
 const int FlexPin = 33;
 const int BuzzerPin = 23;
 int FlexValue = 0;
@@ -294,7 +294,7 @@ void loop() {
 
   //Check and Buzz if needed 
   if(accel.acceleration.z < 0){
-    tone(BuzzerPin, 1000);  // 1000 is the hertz it plays
+    tone(BuzzerPin, 1000);        // 1000 is the hertz it plays
   }  else if (FlexValue > 3200) { // 3200 is the raw analog value of the flex sensor at about 90°
     tone(BuzzerPin, 200);  
     delay(200);
@@ -443,7 +443,7 @@ void loop() {
     flexvaluesarr[average - 1] = analogRead(FlexPin);
     FlexValue += flexvaluesarr[average - 1];
     FlexValue /= average;
-    FlexValue = -0.212069*(FlexValue)+586.55172; // linear regression 
+    FlexValue = -0.212069*(FlexValue)+586.55172;    // linear regression 
     accX /= average;
     accY /= average;
     accZ /= average;
@@ -557,12 +557,12 @@ ylabel('Magnitude (dB)')
 #include "DacESP32.h"
 #include "pitches.h"
 
-#define SPEAKER_PIN 25                       // pin for speaker (25 is an anolog and digital pin)
+#define SPEAKER_PIN 25                       // pin for speaker (25 is an analog and digital pin)
 DacESP32 dac1(25);                           // Creating speaker object
 
 // song info for Coldplay's Hymn for the weekend -- Credit to  HiBit <https://www.hibit.dev>
 
-int melody[] = {                             // notes preset into frequecies in the pitches library
+int melody[] = {                             // notes preset into frequencies in the pitches library
   NOTE_GS4, NOTE_GS4, NOTE_GS4, NOTE_G4, NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4,
   NOTE_G4, NOTE_G4, NOTE_G4, NOTE_G4, NOTE_G4, NOTE_G4,NOTE_F4,NOTE_F4,
   NOTE_GS4, NOTE_GS4, NOTE_GS4, NOTE_G4, NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4,
@@ -642,7 +642,7 @@ void loop() {
   colorWipe(strip.Color(3, 66, 0), 50);                            // green
 }
 
-void colorWipe(uint32_t color, int wait) {                          // makes the strip turn color with a delay of wait milliseconds between when each light switches
+void colorWipe(uint32_t color, int wait) {                         // makes the strip turn color with a delay of wait milliseconds between when each light switches
   for (int i = 0; i < strip.numPixels(); i++) {
     strip.setPixelColor(i, color);
     strip.show();
