@@ -22,7 +22,15 @@ For your final milestone, explain the outcome of your project. Key details to in
 - What you hope to learn in the future after everything you've learned at BSE
 
 # Modifications
-
+My modifications included
+- making a Bluetooth user interface 
+- adding a speaker and getting it to run in parallel with my regular code
+- adding a wall-sitting mode
+- making many attributes customizable 
+- adding a power button and threshold level button 
+- adding a second buzzer and a potentiometer 
+- adding a vibration motor
+- adding a neopixel strip
 
 -->
 # How the components work
@@ -649,7 +657,7 @@ void loop() {
 
 **Neopixel Strip Test Code:**
 ```
-#include <Adafruit_NeoPixel.h>                                     // Needed library 
+#include <Adafruit_NeoPixel.h>                                    // Needed library 
 
 // NeoPixel info varibles 
 const int LEDpin = 32;
@@ -663,11 +671,11 @@ void setup() {
 }
 
 void loop() {
-  colorWipe(strip.Color(0, 70, 92), 50);                           // blue-ish
-  colorWipe(strip.Color(3, 66, 0), 50);                            // green
+  colorWipe(strip.Color(0, 70, 92), 50);                          // blue-ish
+  colorWipe(strip.Color(3, 66, 0), 50);                           // green
 }
 
-void colorWipe(uint32_t color, int wait) {                         // makes the strip turn color with a delay of wait milliseconds between when each light switches
+void colorWipe(uint32_t color, int wait) {                        // makes the strip turn color with a delay of wait milliseconds between when each light switches
   for (int i = 0; i < strip.numPixels(); i++) {
     strip.setPixelColor(i, color);
     strip.show();
