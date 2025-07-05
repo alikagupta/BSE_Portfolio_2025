@@ -21,6 +21,8 @@ For your final milestone, explain the outcome of your project. Key details to in
 - A summary of key topics you learned about
 - What you hope to learn in the future after everything you've learned at BSE
 
+# Modifications
+
 
 -->
 # How the components work
@@ -96,6 +98,18 @@ A biquad filter uses 6 coefficients: b<sub>0</sub>, b<sub>1</sub>, b<sub>2</sub>
 ## Piezo Buzzers:
 Piezoelectric Buzzers work by rapidly vibrating a disc of piezoelectric material at a high frequency. Piezoelectric just means it changes shape when electricity is applied to it.
 
+## Potentiometer:
+Potentiometers are basically variable voltage dividers. As seen in Figure 7, potentiometers have 3 pins, with pins 1 and 3 (ground and power) connected by a resistive strip. That means the resistance between them doesn't change. Pin 2, however, is connected to a wiper that can slide to touch any point on the resistive strip. This means the resistance between the power and pin 2 can change as the amount of the resistance strip between them changes (with more of the resistive strip meaning more resistance). The voltage that goes to pin 2 changes as the resistance changes, in an inverse relationship, just as with the flex sensor. Pin 2 is connected to an analog pin (see the flex sensor section) on the Arduino, which then measures this change, providing a value from 0 to 4095.
+
+<div align="center">
+  <img src="PotPic.png" width="30%" height="30%">
+</div>
+
+<div align="center"> 
+  
+  <i>Figure 7: A diagram of a potentiometer from random nerd tutorials</i>
+</div>
+
 ## Vibration Motor:
 I wanted to create a silent mode that still provided the user with feedback, so I decided to use a vibration motor. There are multiple types of vibration motors, but the type that I chose is the most common. It is called an Eccentric Rotating Mass (ERM) vibration motor, and as the name suggests, it vibrates by rotating a mass. The mass is uneven, so as the mass is rotated at a fast speed, the motor moves in a vibrating motion. I used a coin or pancake-style motor, so unlike larger ERMs, you can't see the mass, but you can see Figure 7 for the structure under the cap. This type of motor is often used for haptic feedback in small devices, like it is in mine.
 <div align="center">
@@ -104,7 +118,7 @@ I wanted to create a silent mode that still provided the user with feedback, so 
 
 <div align="center"> 
   
-  <i>Figure 7: The structure of a coin ERM motor from [I need motors](https://www.ineedmotors.com/vibration-motor/coin-vibration-motor/worlds-smallest-erm-motor.html) modified on Canva</i>
+  <i>Figure 8: The structure of a coin ERM motor from [I need motors](https://www.ineedmotors.com/vibration-motor/coin-vibration-motor/worlds-smallest-erm-motor.html) modified on Canva</i>
 </div>
 
 ## Speaker:
@@ -115,7 +129,7 @@ I decided to add a speaker to my project to make the sound louder and smoother. 
 
 <div align="center"> 
   
-  <i>Figure 8: schematic of my test circuit for the speaker, made on Cirkit designer</i>
+  <i>Figure 9: schematic of my test circuit for the speaker, made on Cirkit designer</i>
 </div>
 
 To wire this circuit, I needed a transistor, a capacitor, an ESP-32, in addition to the speaker. This is because the speaker needs a lot more amps than the ESP-32 can give, so we need a transistor to work as an amplifier. The resistor I used was a 2.2K ohm resistor, but you can vary the resistor depending on the desired volume (with a resistance and volume having an inverse relationship). The way this works is the ESP has the ability to make perfect sinusoidal signals, so that signal is created and passed through the capacitor to filter out the constant. The capacitor acts as a filter, and similarly to taking the derivative of a sinusoidal function, is able to preserve the shape of the signal while removing the offset. The signal then goes to the base pin of the transistor. Transistors have 3 pins: base, collector, and emitter. The base is like the gate that dictates the flow of current from the collector to the emitter. The base value is very small comparatively, as that is what is coming from the ESP's analog pin, rather than the current going through the speaker. The 5V power goes to the speaker directly and then exits to the transistor's collector pin. That then goes through the transistor to its emitter pin, ending at ground. There is also a feedback loop, where the base and collector pins are connected through a resistor, so the current from the collector pin is reduced by the resistor and fed back into the base pin, which "opens the gate" to a stable amount of current flow.
@@ -693,6 +707,6 @@ Next, I will be moving on to my intensive project: the knee rehabilitation devic
 - [Simple Audio Amplifier Circut](https://www.instructables.com/Simple-Audio-Amplifier-Using-Single-Transistor/)
 - [Wikipedia on Operational Amplifiers](https://en.wikipedia.org/wiki/Operational_amplifier)
 - [Guide for NPN transistors](https://www.electronics-tutorials.ws/transistor/tran_2.html)
+- [Guide on Potentiometers](https://randomnerdtutorials.com/electronics-basics-how-a-potentiometer-works/)
 - [Frequency and duration info for some popular songs](https://www.hibit.dev/posts/62/playing-popular-songs-with-arduino-and-a-buzzer)
 - [Guide on parallel multitasking on a esp-23 with FreeRTOS](https://www.circuitstate.com/tutorials/how-to-write-parallel-multitasking-applications-for-esp32-using-freertos-arduino/)
-- 
