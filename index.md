@@ -107,7 +107,7 @@ Potentiometers are basically variable voltage dividers. As seen in Figure 7, pot
 
 <div align="center"> 
   
-  <i>Figure 7: A diagram of a potentiometer from random nerd tutorials</i>
+  <i>Figure 7: A diagram of a potentiometer from Random Nerd Tutorials</i>
 </div>
 
 ## Vibration Motor:
