@@ -102,7 +102,7 @@ Piezoelectric Buzzers work by rapidly vibrating a disc of piezoelectric material
 Potentiometers are basically variable voltage dividers. As seen in Figure 7, potentiometers have 3 pins, with pins 1 and 3 (ground and power) connected by a resistive strip. That means the resistance between them doesn't change. Pin 2, however, is connected to a wiper that can slide to touch any point on the resistive strip. This means the resistance between the power and pin 2 can change as the amount of the resistance strip between them changes (with more of the resistive strip meaning more resistance). The voltage that goes to pin 2 changes as the resistance changes, in an inverse relationship, just as with the flex sensor. Pin 2 is connected to an analog pin (see the flex sensor section) on the Arduino, which then measures this change, providing a value from 0 to 4095.
 
 <div align="center">
-  <img src="PotPic.png" width="30%" height="30%">
+  <img src="potenPic.png" width="30%" height="30%">
 </div>
 
 <div align="center"> 
