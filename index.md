@@ -6,7 +6,7 @@ My project is a device that goes on your knee to make knee rehabilitation easier
 |:--:|:--:|:--:|:--:|
 | Alika G | Woodside Priory | Electrical Engineering | Incoming Junior
 
-![Headstone Image](logo.svg)
+![Headstone Image](AlikaG.heif)
 
 # Final Reflection
 
