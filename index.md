@@ -8,6 +8,19 @@ My project is a device that goes on your knee to make knee rehabilitation easier
 
 ![Headstone Image](logo.svg)
 
+# Final Reflection
+
+During my time at Bluestamp, I was able to learn a lot. The specific concepts I learned that stood out to me were: 
+- Data Filtering (Fourier transform, Biquad filter)
+- Parallel tasks (Free RTOS, Assigning tasks to cores, How stacks work)
+- Audio Amp (How the components work)
+- How to get + use roll, pitch, and yaw from an accelerometer (Madgwick filter)
+- How C++ deals with pointers, addresses, and libraries
+- Applications of optimization 
+Beyond that, I also gained a lot of knowledge on how to approach problems, read/find documentation, and troubleshoot.
+
+After Bluestamp, I hope to continue with engineering, using what I learned here to make my own projects (and troubleshoot them).
+
 # How the components work
 
 ## Flex Sensor:
@@ -201,17 +214,6 @@ My final milestone wasn't very technologically complex, but was honestly one of 
 I also had to recalibrate my flex sensor and accelerometer. My flex sensor might have needed some minor recalibration regardless, but somehow it managed to break. It was drifting a lot and maxing out values, so I ended up needing to replace it. However, the replacement was providing wildly different values, so I re-did the linear regression. The accelerometer was doing fine, but the detections of bad squat form weren't very consistent, so I switched to using roll, pitch, and yaw (as mentioned above in the accelerometer section of How the components work).
 
 One major challenge I was having was solder joints coming apart. While this was somewhat annoying in the start, it was a pretty easy fix originally. It also wasn't happening much while all the components were just sitting on the table. When I ended up sewing them, that's when many of the connections broke, and because the boards were sewn on, I had to replace them with surface mounts. The issue was that when you take the sleeve off or put it on, it stretches, and that was stressing the joints. I tried to prevent this by unplugging the connections that often came out when transferring the sleeve, but a few times I accidentally forgot or would make adjustments to the sleeve position, and some connections broke. In the end, I got so fed up that I decided to epoxy all the connections on my main PCB. That mostly fixed the problem, except for one joint, where the epoxy held the solder joint, but the joint just broke higher in the wire. After soldering that joint back together, everything held. Another challenge was that I accidentally hurt my knee during the recalibration of the accelerometer. When I fell, I accidentally damaged my ESP-32 and had to ultimately switch to a new one.
-
-During my time at Bluestamp, I was able to learn a lot. The specific concepts I learned that stood out to me were: 
-- Data Filtering (Fourier transform, Biquad filter)
-- Parallel tasks (Free RTOS, Assigning tasks to cores, How stacks work)
-- Audio Amp (How the components work)
-- How to get + use roll, pitch, and yaw from an accelerometer (Madgwick filter)
-- How C++ deals with pointers, addresses, and libraries
-- Applications of optimization 
-Beyond that, I also gained a lot of knowledge on how to approach problems, read/find documentation, and troubleshoot.
-
-After Bluestamp, I hope to continue with engineering, using what I learned here to make my own projects (and troubleshoot them).
 
 # Modifications
 <iframe width="560" height="315" src="https://www.youtube.com/embed/RYRgMUZovEs?si=2CZqgzFD0eGt0jXz" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
