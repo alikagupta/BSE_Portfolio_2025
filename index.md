@@ -101,7 +101,9 @@ I wanted to create a silent mode that still provided the user with feedback, so 
 
 <div align="center"> 
   
-  <i>Figure 8: The structure of a coin ERM motor from [I need motors](https://www.ineedmotors.com/vibration-motor/coin-vibration-motor/worlds-smallest-erm-motor.html) modified on Canva</i>
+  <i>Figure 8: The structure of a coin ERM motor from <a href="https://www.ineedmotors.com/vibration-motor/coin-vibration-motor/worlds-smallest-erm-motor.html"> I need motors</a>
+ modified on Canva</i>
+
 </div>
 
 ## Speaker:
