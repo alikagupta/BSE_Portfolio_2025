@@ -162,8 +162,8 @@ A Neopixel strip is just a bunch of Neopixels chained together. Each Neopixel ha
   <i>Figure 10: </i>
 </div>
 
-### Converting acceleration to position
-While you can try to detect good vs. bad squats with acceleration, it's not very consistent, as I saw when I originally tried. The problem is that acceleration is dependent on how fast you move, so while having a certain Z-axis acceleration on a slower squat would mean you had bad form, having that same acceleration on a faster squat would be fine and expected, even with perfect form. To address this, I used my accelerometer to instead describe its 3D position. To do this, I used Euler angles. These are measurements of rotation often used to describe the 3D position of an object, like the nose of a plane. As seen in Figure 11, each measures rotation along a specific axis: roll measures along the longitudinal axis, pitch along the lateral axis, and yaw along the perpendicular axis.
+### Converting acceleration to orientation
+While you can try to detect good vs. bad squats with acceleration, it's not very consistent, as I saw when I originally tried. The problem is that acceleration is dependent on how fast you move, so while having a certain Z-axis acceleration on a slower squat would mean you had bad form, having that same acceleration on a faster squat would be fine and expected, even with perfect form. To address this, I used my accelerometer to instead describe its 3D orientation. To do this, I used Euler angles. These are measurements of rotation often used to describe the 3D orientation of an object, like the nose of a plane. As seen in Figure 11, each measures rotation along a specific axis: roll measures along the longitudinal axis, pitch along the lateral axis, and yaw along the perpendicular axis.
 
 <div align="center">
   <img src="Roll-Yaw-Pitch.png" width="40%" height="40%">
@@ -174,7 +174,7 @@ While you can try to detect good vs. bad squats with acceleration, it's not very
   <i>Figure 11: a diagram of the axis of roll, pitch, and yaw from [smlease](https://www.smlease.com/entries/mechanical-design-basics/what-is-the-difference-between-roll-pitch-yaw-aircraft-motions/)</i>
 </div>
 
-To convert this data, I used a Madgwick filter, which takes in the accelerometer and gyroscopes' values for all 3 axes to find the values of roll, pitch, and yaw. Arduino has a `MadgwickAHRS.h` library that does this.
+To convert this data, I used a Madgwick filter, which takes in the accelerometer and gyroscopes' readings on all three axes to find the values of roll, pitch, and yaw. Arduino has a `MadgwickAHRS.h` library that does this. A Madgwick filter basically uses the data from the gyroscope, which measures rotational motion, to try to make a quaternion (a more complex way of noting orientation than Euler angles, but less susceptible to gimbal lock, which is when you lose a degree of freedom). The filter then uses that to predict the direction of gravity and compares those values to what the accelerometer provides, and uses that to incrementally fix the filter, in what's called a gradient descent, which helps reduce gyroscope drift over time. 
 
 ### Calibration
 
