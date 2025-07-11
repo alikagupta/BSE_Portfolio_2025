@@ -622,6 +622,623 @@ void checkButtons(){
 }
 
 ```
+**Final Milestone:**
+```
+//adding needed libraries
+#include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_LSM6DS33.h>
+#include <BleSerial.h>
+#include <iostream>
+#include <cmath>
+#include <string>
+#include <Arduino.h>
+#include "DacESP32.h"
+#include "pitches.h"
+#include "Music.h"
+#include <Adafruit_NeoPixel.h>
+#include <MadgwickAHRS.h>
+
+
+
+const int NumPixels = 20; // for neopixel strip
+
+// Where pins are 
+const int FlexPin = 33;
+const int BuzzerPin = 23;
+const int topbuttonPin = 15;
+const int powerbuttonPin = 5;
+const int potPin = 4; 
+const int VmotorPin = 26; 
+const int SpeakerPin = 25;
+const int NeoPin = 32;
+
+//Variables accessed by both tasks - music commands
+volatile byte songIndex = 0;
+volatile bool musicPlaying = false; 
+
+// creating objects
+Adafruit_LSM6DS33 lsm6ds33 {}; //accelerometer
+BleSerial ble; // bluetooth
+DacESP32 dac1(SpeakerPin); // speaker
+Adafruit_NeoPixel strip(NumPixels, NeoPin, NEO_GRB + NEO_KHZ800); //neopixel strip
+Madgwick filter; // filter
+
+// user can update variables 
+const int average = 3;
+const int flexAverage = 50;
+int AngleDangerLevel = 1; // 4 = 75, 3 = 90, 2 = 120, 1 = 135
+int soundVal = 1000;
+int wallSitGoal = 60;
+int squatGoal = 10;
+
+bool printCommand = true;
+bool on = true;
+bool buzzerOn = true;
+bool vibrationOn = true;
+bool neoOn = true;
+bool neoStatusMode = false;
+
+// delaring and initializing variables
+int hueOffset = 0;
+int potValue = 0;
+int squatCount = 0;
+
+bool toneon = true;
+bool pressed = false;
+bool flexed = false;
+bool countingsquats = false;
+bool wallsitting = false;
+bool SquatMode = true;
+
+float wallSitTimer = 0;
+float FlexValue = 0;
+float FlexThreshold = 90.0;
+//float b[3] = {0.20573223169460134, 0.4114644633892027, 0.20573223169460134}; // for a cutoff of 1 hz
+//float a[3] = {1.0, -0.3680250041854924, 0.19095393096389768};
+float b[3] = {0.13062385854433664, 0.2612477170886733, 0.13062385854433664}; // for a cutoff of 0.75 hz
+float a[3] = {1.0, -0.7450366885405569, 0.2675321227179034};
+float FlexIns[2] = {0,0};
+float FlexOuts[2]= {0,0};
+float FlexVals[flexAverage];
+float roll;
+float pitch;
+float yaw;
+float rolls[average];
+float pitchs[average];
+float yaws[average];
+
+void setup(){
+  //general setup 
+  Serial.begin(115200);
+  ble.begin("Alika'sKneeRehab");
+  filter.begin(20);
+  pinMode(FlexPin, INPUT);
+  pinMode(BuzzerPin, OUTPUT);
+  pinMode(topbuttonPin, INPUT_PULLUP);
+  pinMode(powerbuttonPin, INPUT_PULLUP);
+  pinMode(potPin, INPUT);
+  pinMode(VmotorPin, OUTPUT);
+  
+
+  xTaskCreatePinnedToCore ( // making the music task and pinning it to core 0 (rest of code runs on core 1), uses FreeRTOS framework
+    SpeakerLoop,            // Function to implement the task
+    "MusicTask",            // Name of the task
+    4096,                   // Stack size in bytes
+    NULL,                   // Task input parameter
+    0,                      // Priority of the task
+    NULL,                   // Task handle.
+    0                       // Core where the task should run
+  );
+
+  //Accelerometer set up -- code from adafruit_LSM6DS33_test example from Adafruit LSM6DS library, to access examples go to file then examples and then select the right library and test
+  lsm6ds33.begin_I2C ();
+  lsm6ds33.setAccelRange(LSM6DS_ACCEL_RANGE_2_G);
+  lsm6ds33.setAccelDataRate(LSM6DS_RATE_52_HZ); 
+  lsm6ds33.setGyroDataRate(LSM6DS_RATE_52_HZ);
+
+  Serial.print("Accelerometer range set to: ");
+  switch (lsm6ds33.getAccelRange()) {
+  case LSM6DS_ACCEL_RANGE_2_G:
+    Serial.println("+-2G");
+    break;
+  case LSM6DS_ACCEL_RANGE_4_G:
+    Serial.println("+-4G");
+    break;
+  case LSM6DS_ACCEL_RANGE_8_G:
+    Serial.println("+-8G");
+    break;
+  case LSM6DS_ACCEL_RANGE_16_G:
+    Serial.println("+-16G");
+    break;
+  }
+
+  Serial.print("Accelerometer data rate set to: ");
+  switch (lsm6ds33.getAccelDataRate()) {
+  case LSM6DS_RATE_SHUTDOWN:
+    Serial.println("0 Hz");
+    break;
+  case LSM6DS_RATE_12_5_HZ:
+    Serial.println("12.5 Hz");
+    break;
+  case LSM6DS_RATE_26_HZ:
+    Serial.println("26 Hz");
+    break;
+  case LSM6DS_RATE_52_HZ:
+    Serial.println("52 Hz");
+    break;
+  case LSM6DS_RATE_104_HZ:
+    Serial.println("104 Hz");
+    break;
+  case LSM6DS_RATE_208_HZ:
+    Serial.println("208 Hz");
+    break;
+  case LSM6DS_RATE_416_HZ:
+    Serial.println("416 Hz");
+    break;
+  case LSM6DS_RATE_833_HZ:
+    Serial.println("833 Hz");
+    break;
+  case LSM6DS_RATE_1_66K_HZ:
+    Serial.println("1.66 KHz");
+    break;
+  case LSM6DS_RATE_3_33K_HZ:
+    Serial.println("3.33 KHz");
+    break;
+  case LSM6DS_RATE_6_66K_HZ:
+    Serial.println("6.66 KHz");
+    break;
+  }
+
+}
+
+void loop() {   
+  int PowbuttonState = digitalRead(powerbuttonPin);
+  while(on){
+    // getting user input
+    if(ble.available() > 0){
+      String line = BleReadLine();
+      if (printCommand){
+        ble.println(line);
+      }
+      // responding appropriately
+      line.toLowerCase(); // this way it is case insesitive 
+      if (line.equals("get my knee angle")){
+        ble.print("Knee angle approximately: ");
+        ble.print(FlexValue);
+        ble.println(" degrees");
+        ble.println();
+        continue;
+      } else if (line.equals("hello") || line.equals("hi")){
+        ble.println("Hello to you too, I'm excited to help you. Type Menu to see what you can do.");
+        ble.println();
+        continue;
+      } else if (line.equals("thanks") || line.equals("thank you")){
+        ble.println("Of course! always happy to help");
+        ble.println();
+        continue;
+      } else if (line.equals("print commands")){
+        ble.println("Done -- now printing commands");
+        printCommand = true;
+        ble.println();
+        continue;
+      } else if (line.equals("don't print commands")){
+        ble.println("Done -- no longer printing commands");
+        printCommand = false ;
+        ble.println();
+        continue;
+      } else if (line.equals("start counting squats")){
+        squatCount = 0;
+        countingsquats = true;
+        neoStatusMode = true;
+        ble.println("Ok now counting your squats");
+        ble.println();
+        continue;
+      } else if (line.equals("stop counting squats")){
+        countingsquats = false;
+        neoStatusMode = false;
+        ble.print("Ok no longer counting squats, you had ");
+        ble.print(squatCount);
+        ble.println(" reps of squats in this session");
+        ble.println();
+        continue;
+      } else if (line.equals("get squats reps")){
+        ble.print("You have done ");
+        ble.print(squatCount);
+        ble.println(" reps of squats so far");
+        ble.println();
+        continue;
+      } else if (line.substring(0,18).equals("set squat goal to ")){
+        squatGoal = line.substring(18).toInt();
+        ble.print("Squat goal at ");
+        ble.print(squatGoal);
+        ble.println(" squats");
+        ble.println();
+        continue;
+      } else if (line.equals("get flex threshold")){
+        ble.print("Your current flex threshold is ");
+        ble.println(FlexThreshold);
+        ble.println();
+        continue;
+      } else if (line.substring(0,22).equals("set flex threshold to ")){
+        FlexThreshold = line.substring(22).toFloat();
+        ble.print("Flex threshold now at ");
+        ble.print(line.substring(22));
+        ble.println(" degrees");
+        ble.println();
+        continue;
+      } else if (line.equals("start wallsit")){
+        tone(BuzzerPin, 0);
+        wallsitting = true;
+        neoStatusMode = true;
+        SquatMode = false;
+        ble.println("Started wallsit");
+        ble.println();
+        continue;
+      } else if (line.equals("how long have i been wallsiting")){
+        ble.print("You have been wallsetting for ");
+        ble.print(wallSitTimer);
+        ble.println(" seconds");
+        ble.println();
+        continue;
+      } else if (line.substring(0,21).equals("set wallsit goal to ")){
+        wallSitGoal = line.substring(21).toFloat();
+        ble.print("Wallsit goal now at ");
+        ble.println(line.substring(21));
+        ble.println();
+        continue;
+      }else if (line.equals("play music")){
+        musicPlaying = true;
+        ble.print("Music started");
+        ble.println();
+        continue;
+      } else if (line.equals("pause music")){
+        musicPlaying = false;
+        ble.println("Music paused");
+        ble.println();
+        continue;
+      } else if (line.equals("see music menu")){
+        printMusicMenu(&ble); //& means getting the adress
+        ble.println();
+        continue;
+      } else if (line.substring(0,19).equals("set music to track ")){
+        songIndex = (byte)line.substring(19).toInt();
+        ble.print("playing ");
+        ble.println(getSong(line.substring(19).toInt()));
+        ble.println();
+        continue;
+      } else if (line.equals("what is the music")){
+        ble.print("The music that is currently playing is ");
+        ble.println(getSong(songIndex));
+        ble.println();
+        continue;
+      } else if (line.equals("mute buzzer")){
+        tone(BuzzerPin, 0); 
+        ble.print("buzzer turned off");
+        buzzerOn = false;
+        ble.println();
+        continue;
+      } else if (line.equals("unmute buzzer")){
+        ble.print("buzzer turned on");
+        buzzerOn = true;
+        ble.println();
+        continue;
+      } else if (line.equals("vibration off")){
+        ble.print("vibration turned off");
+        vibrationOn = false;
+        ble.println();
+        continue;
+      } else if (line.equals("vibration on")){
+        ble.print("vibration turned on");
+        vibrationOn = true;
+        ble.println();
+        continue;
+      } else if (line.equals("lights on")){
+        ble.print("lights strip turned on");
+        neoOn = true;
+        ble.println();
+        continue;
+      } else if (line.equals("lights off")){
+        ble.print("lights strip turned off");
+        neoOn = false;
+        ble.println();
+        continue;
+      } else if (line.equals("menu")){ // I had to put multiple lines in one print statment because the bluetooth gets overhemlmed if there are more than about 15 print statments 
+        ble.println("Here is a list of the commands you can type in an what they will do (case insensitive): ");
+        ble.println();
+        ble.println("1) Print commands -- means that you can see the commands you type. \n2) Don't print commands -- means that you don't see the commands you type"); //about printing
+        ble.println("3) Get my knee angle -- tells you the approximate angle of your knee at that moment"); //about knee angle
+        ble.println("4) Set flex threshold to _YourValueHere_ -- the beeping will start when you knee reaches the angle you put in, default is 90°, you can also adjust this with the green button which cycles though set thresholds \n5) Get flex threshold -- tells you what your current get flex threshold is");
+        ble.println("6) Start counting squats -- starts counting the number of times you pass your flex threshold, starting at 0 \n7) Stop counting squats -- stops counting and tells you how many squats you did \n8) Get squats reps -- tells you how many squats you did \n9) set squat goal to __YourValueHere__ -- the default is 10, its just the goal that will show on your statud bar"); //about squats
+        ble.println("10) Set wallsit goal to _YourValueHere_ -- sets the goal (in seconds) for your wallsit, default is 60 seconds \n11) Start wallsit -- starts your wallsit (start while sitting alredy), you don't need to stop it will automatically stop when you stand up \n12) How long have I been wallsiting -- tell you how long you have been wallsiting in seconds"); // about wallsitting
+        ble.println("13) Play music \n14) Pause music \n15) See music menu - gives you a list songs and their artists, each corresponds to a track number \n16) set music to track _NumberOfTrackHere_ - sets the music to the song that corresponds to that track number \n17) What is the music - tells you what song is playing"); // about music
+        ble.println("18) mute buzzer -- buzzer is defalut on \n19) unmute buzzer \n20) vibration off -- vibration is defualt on \n21) vibration on"); //about buzzing and vibration modes
+        ble.println("22) lights on -- turns the neopixel strip on \n23) lights off -- turns the neopixel strip off");//about lights
+        ble.println();
+        continue;
+      } else {
+        ble.println("Sorry that is not a command I know. If you need to see available command type menu");
+        ble.println();
+        continue;
+      }
+    }
+
+    // neopixel setting
+    if(neoOn){
+      if(neoStatusMode){
+        if(SquatMode && countingsquats){
+          neopixelStatus(squatCount, squatGoal);
+        } else if(wallsitting){
+          neopixelStatus(wallSitTimer, wallSitGoal);
+        }
+      }else{
+        neoPixelLoopingPastelRainbow();
+      }
+    } else{
+      neoPixelOff();
+    }
+
+    //get topbutton state
+    byte topbuttonState = digitalRead(topbuttonPin);
+
+    // Converting the analog value of the potentiometer to a hertz value between 100 and 5000
+    soundVal = 1.19658*(analogRead(potPin))+100;
+
+    //accerometer 
+    //gettting pitch yaw and roll
+    sensors_event_t accel;
+    sensors_event_t gyro;
+    sensors_event_t temp;
+    lsm6ds33.getEvent(&accel, &gyro, &temp);
+    float gx = gyro.gyro.x * 180.0 / PI;
+    float gy = gyro.gyro.y * 180.0 / PI;
+    float gz = gyro.gyro.z * 180.0 / PI;
+    filter.updateIMU(gx, gy, gz, accel.acceleration.x, accel.acceleration.y,accel.acceleration.z);
+
+    roll = filter.getRoll();
+    pitch = filter.getPitch();
+    yaw = filter.getYaw();
+
+    Serial.print(pitch);
+    Serial.print("     ");
+
+    // averaging roll pitch yaw
+    roll = averageVals(rolls, roll, average);
+    pitch = averageVals(pitchs, pitch, average);
+    yaw = averageVals(yaws, yaw, average);
+
+
+    //Filtering FlexValue
+    
+    FlexValue = analogRead(FlexPin);
+    FlexValue = -0.192804*FlexValue + 191.33764;                                                         // linear regression
+    float rawFlexValue = FlexValue;
+    FlexValue = b[0]*FlexValue + b[1]*FlexIns[1] + b[2]*FlexIns[0] - a[1]*FlexOuts[1] -a[2]*FlexOuts[0]; // biquad filter
+    FlexIns[0] = FlexIns[1];                                                                             // updating varibles needed in biquad
+    FlexIns[1] = rawFlexValue;
+    FlexOuts[0] = FlexOuts[1];
+    FlexOuts[1] = FlexValue;
+    averageVals(FlexVals, FlexValue, flexAverage);
+
+    checkButtons();
+
+    //print flex sensor data
+    Serial.print("Flex Sensor Value: ");
+    Serial.println(FlexValue);
+
+
+    //Check and Buzz/virbate if needed - for squats 
+    if (SquatMode){
+      if (FlexValue < FlexThreshold) {            // beep for flex 
+        if(toneon){
+          if(buzzerOn){
+            tone(BuzzerPin, soundVal); 
+          } else {
+            tone(BuzzerPin, 0); 
+          }
+          if(vibrationOn){
+            digitalWrite(VmotorPin, HIGH); 
+          }
+        } else {
+        tone(BuzzerPin, 0); 
+        digitalWrite(VmotorPin, LOW); 
+      }
+      toneon = !toneon;
+      if(!flexed){
+        flexed = true;
+        if(countingsquats){
+          squatCount++;
+        }
+      }
+      } else if (FlexValue < 120 && pitch < -58){   // improper form
+        if(buzzerOn){
+          tone(BuzzerPin, soundVal); 
+        } else {
+          tone(BuzzerPin, 0); 
+        }
+        if(vibrationOn){
+          digitalWrite(VmotorPin, HIGH); 
+        } 
+      }else{
+        tone(BuzzerPin, 0);  
+        if(vibrationOn){
+          digitalWrite(VmotorPin, LOW); 
+        } 
+      }
+    }
+
+    // wall sits mode
+    if(wallsitting){
+      if(wallSitGoal <= wallSitTimer){
+        if(buzzerOn){
+          tone(BuzzerPin, soundVal); 
+        }
+        if(vibrationOn){
+          digitalWrite(VmotorPin, HIGH); 
+        }
+      }
+      if(FlexValue < (FlexThreshold + 10)){ //+10 so that inconsistencies don't break the wall sit as easily
+        wallSitTimer += 0.1;
+      }else{
+        wallsitting = false;
+        SquatMode = true;
+        neoStatusMode = false; 
+        float difference = wallSitGoal - wallSitTimer;
+        ble.print("You got up, the wall sit timer stoped at: ");
+        ble.print(wallSitTimer);
+        ble.print(" seconds. ");
+        if(difference > 0){
+          ble.print("You were about ");
+          ble.print(difference);
+          ble.println(" seconds short of your goal");
+        }else{
+          ble.println("You met your goal :) Great job!");
+        }
+        wallSitTimer = 0;
+      }
+    }
+    delay(50);
+  }
+  if (PowbuttonState == LOW) { 
+    on = !on;
+  }
+  tone(BuzzerPin, 0); 
+  digitalWrite(VmotorPin, LOW);
+  delay(50);
+}
+
+void checkButtons(){
+  // check power 
+  if (digitalRead(powerbuttonPin) == LOW) { 
+    on = !on;
+    if(on){
+      ble.println("on");
+    } else {
+      ble.println("off");
+    }
+  } 
+  // angle level 
+  if (digitalRead(topbuttonPin) == LOW && !pressed) {
+    pressed = true;
+      if(AngleDangerLevel < 4){
+        AngleDangerLevel ++;
+      }else if (AngleDangerLevel == 4){
+        AngleDangerLevel = 1;
+      }
+      Serial.print("Angle Level now: ");
+      Serial.println(AngleDangerLevel);
+      ble.print("Angle Level now: ");
+      ble.println(AngleDangerLevel);
+      // converting angle level 
+      switch(AngleDangerLevel){
+      case 1:
+          FlexThreshold = 135;
+          break;
+      case 2:
+          FlexThreshold = 120;
+          break;
+      case 3:
+          FlexThreshold = 90;
+          break;
+      case 4:
+          FlexThreshold = 75;
+          break;
+      }
+  } else if (digitalRead(topbuttonPin) == LOW){
+    pressed = true;
+  } else if (digitalRead(topbuttonPin) == HIGH){
+    pressed = false;
+  }
+}
+
+
+//converting a line from decimal to chars
+String BleReadLine(){ 
+  String str = "";
+  while (ble.available() > 0){
+    str += static_cast<char>(ble.read());
+  }
+  return str;
+}
+
+float averageVals(float* arr, float newVal, int average){ // averages values with a moving finite average 
+  float ave = 0.0;
+  for (int i = 0; i < (average-1); i++){
+    arr[i] = arr[i+1];
+    ave += arr[i];
+  }
+  arr[average - 1] = newVal;
+  ave += arr[average - 1];
+  ave /= average;
+  return ave;
+}
+
+
+// neopixel options
+void neoPixelLoopingPastelRainbow(){
+  if(neoOn){
+    for (int i = 0; i < NumPixels; i++) {                  // loops though all the neopixels
+      int hue = (hueOffset + i * 8) % 256;                 //% 256 keeps hue between 0-255 making it loop
+      uint32_t color = strip.ColorHSV(hue * 256, 100, 80); // 100 is saturation, 80 is brightness // this is dimming it and making it more pastel like // hue values range from 0–65535 but thats super annoying so I'm only working with 0-255, but that means I need to multiply the hue value by 256 to get it in the proper range of 0–65535 
+      color = strip.gamma32(color);                        // makes the colors look more correct/smooths them
+      strip.setPixelColor(i, color);
+    }
+    strip.show();
+    hueOffset = (hueOffset + 2) % 256;                     // the shift
+  }
+}
+
+void neoPixelOff(){
+  for (int i = 0; i < NumPixels; i++) {                    // loops though all the neopixels
+    strip.setPixelColor(i, 0,0,0);
+  }
+  strip.show();
+}
+
+void neopixelStatus(int progress, int goal){
+  int compleatedPercent = ((float)progress/goal)*100;
+  for (int i = 0; i < NumPixels; i++) {                    // sets all the neopixels to red
+    strip.setPixelColor(i, 150,0,0);
+  }
+  for (int i = 0; 0 < compleatedPercent; i++){             // turns the ones that need to be green green and the intesity of the green of the last neopixel is based on the indivisual percent
+    if((int)compleatedPercent/5 > 0){
+      strip.setPixelColor(i, 0,150,0);
+      compleatedPercent -= 5;
+    } else {
+      strip.setPixelColor(i, 0, 30 * (compleatedPercent % 5),0);
+      compleatedPercent = 0;
+    }
+  }
+  strip.show();
+}
+
+
+// seperate task for running music
+void SpeakerLoop(void* pvParameters){ 
+  while(true){
+    while(musicPlaying){
+      //setting the pointers for the music
+      int *melody = melodies[songIndex];
+      int *duration = durations[songIndex];
+      int currentSong = songIndex;
+      for (int note = 0; duration[note] != 0 && musicPlaying; note++) {
+        if(songIndex != currentSong){                // if song changes 
+          break;
+        }
+        int durationTime = 1000 / duration[note];
+        dac1.outputCW(melody[note]);                 // getting note from array
+        delay(durationTime);                         // note duration 
+        int pauseBetweenNotes = durationTime * 0.30; // pause so you can really hear the notes better
+        delay(pauseBetweenNotes);
+        dac1.outputCW(0);
+      }
+    }
+    float zero = 0.0;
+    dac1.outputVoltage(zero);
+  }
+}
+
+```
 **MATLAB Code for the discrete Fourier transform:**
 ```
 % Sampling frequency = 5Hz
