@@ -152,15 +152,15 @@ I wanted to keep my code cleaner, so when I realized I would need huge arrays of
 A Neopixel strip is just a bunch of Neopixels chained together. Each Neopixel has a red LED, green LED, and blue LED that shine at different brightnesses to make a rainbow of colors. Each Neopixel receives 3 bytes of information (8 bits for each color) on its data pin and gets 5V from its power pin, with its last pin being ground. These pins of each Neopixel are attached together in a Neopixel strip. You just need to connect the wires from the neopixel at the start end, with power to the ESP-32's Vin, ground to ground, and the data pin to one of the digital pins on the ESP-32. I then tested the strip with some basic code (see Neopixel Strip Test Code in the Appendix A) before integrating it into my project. 
 
 ## Accelerometer:
-
+An accelerometer works by detecting small changes caused by the movement of a small mass in response to acceleration. When under acceleration, the mass moves, but the fixed electrodes don't (see figure 10). It uses those changes to measure acceleration.
 
 <div align="center">
-  <img src="" width="40%" height="40%">
+  <img src="Accel.png" width="40%" height="40%">
 </div>
 
 <div align="center"> 
   
-  <i>Figure 10: </i>
+  <i>Figure 10: Diagram of the inside of an accelerometer from [A conference paper by Amerini et al.](https://www.researchgate.net/publication/308074268_Robust_smartphone_fingerprint_by_mixing_device_sensors_features_for_mobile_strong_authentication) with labeled parts</i>
 </div>
 
 ### Converting acceleration to orientation
