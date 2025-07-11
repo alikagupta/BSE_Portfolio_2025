@@ -47,7 +47,7 @@ I used regression to convert the flex sensor's raw value to degrees. After tryin
 
 ## Digital Biquad Filter:
 
-In an effort to make my flex sensor data more consistent, I explored ways to create a low-pass filter. The goal of this is to push frequencies past a certain threshold to zero. The first step was recording the raw, unaveraged data from the flex sensor. I used a discrete fourier transform (see MATLAB Code for the discrete Fourier transform in the appendix) to plot a sample of this data when my knee was at 90° for a few seconds. This data was plotted in magnitude with respect to frequency, meaning it tells you what frequencies are represented in the data and how much of each frequency is there (Figure 4).
+In an effort to make my flex sensor data more consistent, I explored ways to create a low-pass filter. The goal of this is to push frequencies past a certain threshold to zero. The first step was recording the raw, unaveraged data from the flex sensor. I used a discrete fourier transform (see MATLAB Code for the discrete Fourier transform in Appendix A) to plot a sample of this data when my knee was at 90° for a few seconds. This data was plotted in magnitude with respect to frequency, meaning it tells you what frequencies are represented in the data and how much of each frequency is there (Figure 4).
 <div align="center">
   <img src="plot.png" width="70%" height="70%">
 </div>
@@ -106,7 +106,7 @@ I wanted to create a silent mode that still provided the user with feedback, so 
 </div>
 
 ## Speaker:
-I decided to add a speaker to my project to make the sound louder and smoother. To test this out, I made a circuit on the breadboard (Figure 8) and some test code just for it (see Speaker Test Code in the appendix).
+I decided to add a speaker to my project. To test this out, I made a circuit on the breadboard (Figure 8) and some test code just for it (see Speaker Test Code in Appendix A).
 <div align="center">
   <img src="SpeakerScematics.png" width="40%" height="40%">
 </div>
@@ -119,7 +119,7 @@ I decided to add a speaker to my project to make the sound louder and smoother. 
 To wire this circuit, I needed a transistor, a capacitor, an ESP-32, in addition to the speaker. This is because the speaker needs a lot more amps than the ESP-32 can give, so we need a transistor to work as an amplifier. The resistor I used was a 2.2K ohm resistor, but you can vary the resistor depending on the desired volume (with a resistance and volume having an inverse relationship). The way this works is the ESP has the ability to make perfect sinusoidal signals, so that signal is created and passed through the capacitor to filter out the constant. The capacitor acts as a filter, and similarly to taking the derivative of a sinusoidal function, is able to preserve the shape of the signal while removing the offset. The signal then goes to the base pin of the transistor. Transistors have 3 pins: base, collector, and emitter. The base is like the gate that dictates the flow of current from the collector to the emitter. The base value is very small comparatively, as that is what is coming from the ESP's analog pin, rather than the current going through the speaker. The 5V power goes to the speaker directly and then exits to the transistor's collector pin. That then goes through the transistor to its emitter pin, ending at ground. There is also a feedback loop, where the base and collector pins are connected through a resistor, so the current from the collector pin is reduced by the resistor and fed back into the base pin, which "opens the gate" to a stable amount of current flow.
 
 ## Running two loops concurrently:
-I wanted to run two loops in true parallel (not just switching between them really fast), so my normal code could run while the speaker played music, which is called multitasking. To do this, I used FreeRTOS(free real-time operating system) in the regular Arduino IDE. More technically, multitasking means you create 2 independent tasks and then run them on the same or different cores. Lucky for me, ESP-32s have 2 cores: core 0 and core 1. My first step was figuring out what core my code was currently running on. To do this, I added `Serial.println(xPortGetCoreID());` to the end of the main loop. This told me that my knee rehab code was running on core 1 (which is the default for Bluetooth, which I use). Next I created my task as seen below:
+I wanted to run two loops in true parallel (not just switching between them really fast), so my normal code could run while the speaker played music, which is called multitasking. To do this, I used FreeRTOS(free real-time operating system) in the regular Arduino IDE. More technically, multitasking means you create 2 independent tasks and then run them on the same or different cores. Lucky for me, ESP-32s have 2 cores: core 0 and core 1. My first step was figuring out what core my code was currently running on. To do this, I added `Serial.println(xPortGetCoreID());` to the end of the main loop. This told me that my knee rehab code was running on core 1 (which is the default for Bluetooth, which I use). Next, I created my task as seen below:
 
 ```
 void SpeakerLoop(void* pvParameters){ 
@@ -142,13 +142,15 @@ Next, we want to take this SpeakerLoop function and make it a task pinned to the
     0                // Core where the task should run
   );
 ```
-The first two parameters are pretty straightforward. The stack size is how much space/memory you are giving to the task. All the variables specific to that task will be put "on top of the stack" (or actually bottom because stacks build down). The return addresses or functions, and various other things, also go on the stacks. What I did to choose the size was to start small and then just increase the size until I wasn't getting stack overflow or stack canary errors. It is convention to use powers of 2 for the bytes (a byte is just 8 bits) that you specify. The next line is the pointer parameter we are passing in (the void* pvParameters from earlier), but since I'm not using it, I just put NULL. Priority tells the computer that if it has a conflict between two tasks, which one to choose. 0 is the highest priority. The priority doesn't matter too much in this case because the two tasks aren't really interacting, they are running on different cores, and neither will be that problematic if they are delayed by a very small amount of time. The task handle is the pointer (points directly to the address) or handle (an abstract reference managed by a separate system) for the task it is creating. I didn't need one, so I just put NULL. Finally, it needs the number of the core I am pinning it to, which is 0. If you want more information on this, I recommend looking at [How to Write Parallel Multitasking Applications for ESP32 using FreeRTOS & Arduino.](https://www.circuitstate.com/tutorials/how-to-write-parallel-multitasking-applications-for-esp32-using-freertos-arduino/). Also, an important thing to remember is you need to add the volatile keyword before any variable accessed by multiple tasks/cores. In general you want to have as little information as possible accessible to both, so I'm only having a boolean and a byte (instead of an int because ints are 4 bytes).
+The first two parameters are pretty straightforward. The stack size is how much space/memory you are giving to the task. All the variables specific to that task will be put "on top of the stack" (or actually bottom because stacks build down). The return addresses or functions, and various other things, also go on the stacks. What I did to choose the size was to start small and then just increase the size until I wasn't getting stack overflow or stack canary errors. It is convention to use powers of 2 for the bytes (a byte is just 8 bits) that you specify. The next line is the pointer parameter we are passing in (the void* pvParameters from earlier), but since I'm not using it, I just put NULL. Priority tells the computer that if it has a conflict between two tasks, which one to choose. 0 is the highest priority. The priority doesn't matter too much in this case because the two tasks aren't really interacting, they are running on different cores, and neither will be that problematic if they are delayed by a very small amount of time. The task handle is the pointer (points directly to the address) or handle (an abstract reference managed by a separate system) for the task it is creating. I didn't need one, so I just put NULL. Finally, it needs the number of the core I am pinning it to, which is 0. If you want more information on this, I recommend looking at [How to Write Parallel Multitasking Applications for ESP32 using FreeRTOS & Arduino.](https://www.circuitstate.com/tutorials/how-to-write-parallel-multitasking-applications-for-esp32-using-freertos-arduino/). Also, an important thing to remember is you need to add the volatile keyword before any variable accessed by multiple tasks/cores. In general, you want to have as little information as possible accessible to both, so I'm only having a boolean and a byte (instead of an int because ints are 4 bytes).
 
 ## Creating your own library:
 I wanted to keep my code cleaner, so when I realized I would need huge arrays of the notes and durations of each note for every song I wanted the user to be able to play, I decided to make my own music library. The way libraries work in C++ is that they are effectively just pasted in, so the code is pretty much the same. I created a file on TextEdit and then converted it from .rtf (rich text format) to .h (header). IMPORTANT: when converting your .h file will look the same, but when you actually open up the code of it, there  will be random remnants from rtf trying to tell you the lost information, just delete that, otherwise it will throw errors. Then just drag the file into the folder of the project you are working in (in Documents/Arduino) next to the .ino file. In your .ino (regular code) file, include the name of your library, in my case `#include "Music.h"`. Then you are free to code in your library, just remember that it needs to be able to compile by itself, so if you are adding functions, you might need to pass in pointers. To pass a pointer to a function, put &variableName, because, unlike Java, if you just put the name of the variable, it is not a pointer but the information (rvalues) of the object. To declare an input parameter a pointer for something, put variableType *variableName. 
 
+> To see the music.h library, go to the music library section in Appendix A
+
 ## Neopixel Strip:
-A Neopixel strip is just a bunch of Neopixels chained together. Each Neopixel has a red LED, green LED, and blue LED that shine at different brightnesses to make a rainbow of colors. Each Neopixel receives 3 bytes of information (8 bits for each color) on its data pin and gets 5V from its power pin, with its last pin being ground. These pins of each Neopixel are attached together in a Neopixel strip. You just need to connect the wires from the neopixel at the start end, with power to the ESP-32's Vin, ground to ground, and the data pin to one of the digital pins on the ESP-32. I then tested the strip with some basic code (see Neopixel Strip Test Code in the appendix) before integrating it into my project. 
+A Neopixel strip is just a bunch of Neopixels chained together. Each Neopixel has a red LED, green LED, and blue LED that shine at different brightnesses to make a rainbow of colors. Each Neopixel receives 3 bytes of information (8 bits for each color) on its data pin and gets 5V from its power pin, with its last pin being ground. These pins of each Neopixel are attached together in a Neopixel strip. You just need to connect the wires from the neopixel at the start end, with power to the ESP-32's Vin, ground to ground, and the data pin to one of the digital pins on the ESP-32. I then tested the strip with some basic code (see Neopixel Strip Test Code in the Appendix A) before integrating it into my project. 
 
 ## Accelerometer:
 
@@ -174,24 +176,35 @@ While you can try to detect good vs. bad squats with acceleration, it's not very
   <i>Figure 11: a diagram of the axis of roll, pitch, and yaw from [smlease](https://www.smlease.com/entries/mechanical-design-basics/what-is-the-difference-between-roll-pitch-yaw-aircraft-motions/)</i>
 </div>
 
-To convert this data, I used a Madgwick filter, which takes in the accelerometer and gyroscopes' readings on all three axes to find the values of roll, pitch, and yaw. Arduino has a `MadgwickAHRS.h` library that does this. A Madgwick filter basically uses the data from the gyroscope, which measures rotational motion, to try to make a quaternion (a more complex way of noting orientation than Euler angles, but less susceptible to gimbal lock, which is when you lose a degree of freedom). The filter then uses that to predict the direction of gravity and compares those values to what the accelerometer provides, and uses that to incrementally fix the filter, in what's called a gradient descent, which helps reduce gyroscope drift over time. 
+To convert this data, I used a Madgwick filter, which takes in the accelerometer and gyroscopes' readings on all three axes to find the values of roll, pitch, and yaw. Arduino has a `MadgwickAHRS.h` library that does this. A Madgwick filter basically uses the data from the gyroscope, which measures rotational motion, to try to make a quaternion (a more complex way of noting orientation than Euler angles, but less susceptible to gimbal lock, which is when you lose a degree of freedom). The filter then uses that to predict the direction of gravity and compares those values to what the accelerometer provides, and uses that to incrementally fix the filter, in what's called a gradient descent, which helps reduce gyroscope drift over time. The library then has functions to get the pitch, roll, and yaw from the quaternion. 
 
 ### Calibration
+Now that I had my Euler angles, I moved to finding out how to detect a bad vs a good squat. Arduino has an in-built serial plotter, but it is very limited, so I used CoolTerm as my serial plotter. I plotted 5 variables (or traces) while a person with the compression sleeve on did good or bad squats. Based on this, I choose thresholds for the buzz variable to "beep" by switching to a value of 130. To see the code I used, look for Testing Accelerometer Calibration Code in Appendix A. I did this over a decent course of time. You can see an example of how the data looked in Figure 12.
+
+<div align="center">
+  <img src="GvBSquat.png" width="40%" height="40%">
+</div>
+
+<div align="center"> 
+  
+  <i>Figure 12: A graph of printed values with respect to when they were printed, made with CoolTerm's serial plotter. Modified to show when the user was performing a good and a bad squat. The traces correspond to variables as follows: 1 is roll, 2 is pitch, 3 is yaw, 4 is the angle of the knee, and 5 is buzz (with -30 symbolizing the buzzer off and 130 symbolizing it on)</i>
+</div>
+
+As you can see, roll and yaw (blue and red) were not very consistent. By far the best measure of whether a squat was occurring was, expectedly, the angle of the knee (cyan). I also noticed that the pitch (green) was the best indication of a good vs. bad squat. As you can see in the figure, during a bad squat, the pitch remained roughly flat, while on a good squat, the pitch significantly rose (look at the arrow). Using the angle of the knee in conjunction with pitch, in a nested if statement, to distinguish bad and good squats worked successfully, as seen by the fact that the buzz (magenta) only went up for the bad squat.
 
 <!-- # Final Milestone
 
-**Don't forget to replace the text below with the embedding for your milestone video. Go to Youtube, click Share -> Embed, and copy and paste the code to replace what's below.**
-
 <iframe width="560" height="315" src="https://www.youtube.com/embed/F7M7imOVGug" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
-My final milestone wasn't very technologically complex, but was honestly one of the most frustrating yet important to finish: sewing and soldering. I started with soldering. I first moved the connection from my breadboard to my first PCB, which was honestly pretty relaxing. Next, I plotted out where on the sleeve I wanted things to be. I knew I wanted the flex sensor in the back, for the best readings, and the PCB on the outer side for easy access to the buttons and potentiometer. I also wanted the LED on the top, where it would be easily visible, and the accelerometer on the upper outer thigh, as that is where you get the most change in data when squatting. Based on these restrictions, I figured out where the rest of the components needed to be placed. Next, I sewed a pouch for the battery pack, and added  Velcro on it and the knee compression sleeve to make it detachable. This means you can get rid of the bulkiest item if you aren't using it, or attach it elsewhere. It also allows the user to replace or recharge the battery pack easily, without having to worry about the whole device. KEEP GOING 
+My final milestone wasn't very technologically complex, but was honestly one of the most frustrating yet important to finish: sewing and soldering. I started with soldering. I first moved the connection from my breadboard to my first PCB, which was honestly pretty relaxing. Next, I plotted out where on the sleeve I wanted things to be. I knew I wanted the flex sensor in the back, for the best readings, and the PCB on the outer side for easy access to the buttons and potentiometer. I also wanted the LED on the top, where it would be easily visible, and the accelerometer on the upper outer thigh, as that is where you get the most change in data when squatting. Based on these restrictions, I figured out where the rest of the components needed to be placed. Next, I sewed a pouch for the battery pack, and added  Velcro on it and the knee compression sleeve to make it detachable. This means you can get rid of the bulkiest item if you aren't using it, or attach it elsewhere. It also allows the user to replace or recharge the battery pack easily, without having to worry about the whole device. I then finalized and soldered my second PCB. This PCB was much harder as it was very small and was a bad quality flex PCB, with traces that were only on one side and easily lifted off. It also didn't have pre-made connections like the first PCB. I then moved on to sewing. I sewed all the components in through their holes (I made loops for the flex sensor, and attached the speaker to foam with two-part epoxy adhesive and then sewed the foam in). 
 
 I also had to recalibrate my flex sensor and accelerometer. My flex sensor might have needed some minor recalibration regardless, but somehow it managed to break. It was drifting a lot and maxing out values, so I ended up needing to replace it. However, the replacement was providing wildly different values, so I re-did the linear regression. The accelerometer was doing fine, but the detections of bad squat form weren't very consistent, so I switched to using roll, pitch, and yaw (as mentioned above in the accelerometer section of How the components work).
 
 One major challenge I was having was solder joints coming apart. While this was somewhat annoying in the start, it was a pretty easy fix originally. It also wasn't happening much while all the components were just sitting on the table. When I ended up sewing them, that's when many of the connections broke, and because the boards were sewn on, I had to replace them with surface mounts. The issue was that when you take the sleeve off or put it on, it stretches, and that was stressing the joints. I tried to prevent this by unplugging the connections that often came out when transferring the sleeve, but a few times I accidentally forgot or would make adjustments to the sleeve position, and some connections broke. In the end, I got so fed up that I decided to epoxy all the connections on my main PCB. That mostly fixed the problem, except for one joint, where the epoxy held the solder joint, but the joint just broke higher in the wire. After soldering that joint back together, everything held. Another challenge was that I accidentally hurt my knee during the recalibration of the accelerometer. When I fell, I accidentally damaged my ESP-32 and had to ultimately switch to a new one.
 
-- A summary of key topics you learned about
-- What you hope to learn in the future after everything you've learned at BSE
+- A summary of key topics you learned about + challenges
+
+After Bluestamp, I hope to continue with engineering, using what I learned here to make my own projects (and troubleshoot them).
 
 # Modifications
 My modifications included:
@@ -205,13 +218,23 @@ My modifications included:
 Rehab is a very dynamic process; it is based on your needs and abilities in the moment. I wanted to address 
 
 A challenge I encountered in this portion of the project was that at one point, the Bluetooth would randomly disconnect and not be able to print the menu or else commands. It turned out that these were two separate issues. First, the inability to print the menu was because the Bluetooth can only take a certain number of print statements in succession (~ 15) before it's too much for it. The solution was pretty simple and just involved putting multiple lines of printing into one statement and just using `\n` to separate new lines. The second problem was much more confusing to solve. Ultimately, adding a `continue;` to the end of every if, else if, or else statement in the if-else-if ladder for Bluetooth fixed it.
+
+## Adding a speaker and getting it to run in parallel with my regular code
+I decided that it would be fun to have music playing (and I wanted to learn how to make an audio amp), so I wanted to add a speaker. I first made the circuit and ran test code (see Speaker section in How the components work). As I was transferring the speaker's music code to my main project, I realized the delays of the speaker would mess the whole project up, so I researched how to run things in parallel and ended up successfully using FreeRTOS to do this (see Running two loops concurrently section in How the components work). I then added some basic commands like play and pause music, but I still wanted to add more customizability. This would be very bulky to just add into my code, so I created a separate library for it instead (see Creating your own library section in How the components work). I then added Bluetooth commands to do things like change songs or see what song is playing.
+
+## Creating a wall-sitting mode
+
+## Adding a neopixel strip with status bar and pastel rainbow modes 
+
+## Adding assorted small components: Vibration Motor, Potentiometer, Power Button, Angle level button, Second Buzzer
+These were all pretty easy to add. They are all easily accessible on the main PCB. The Potentiometer, Vibration Motor, and Buzzer have sections in How the components work. The buttons work by connecting when you push down, sending a high signal to the Arduino. 
 -->
 
 # Second Milestone
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/kZ0Yr-viwl8?si=Qh_XLWgTdqZkQEg_" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-My second milestone consisted of attaching the device to a knee brace (in a temporary manner) and calibrating the threshold values for the sensors based on that. I also added averaging for the sensor data so it would be more consistent and precise. You can choose how many values to average in a moving average (right now it is set at 50). I was able to attach everything with rubber bands and took some time to find the best placement for the flex sensor, which I determined to be under the knee, since it was the most accurate (see Second milestone code in appendix). There weren't too many technical changes from the first milestone. I also added a button to change the threshold of the flex sensor, a power button, and a potentiometer that changes the frequency of the beeps. 
+My second milestone consisted of attaching the device to a knee brace (in a temporary manner) and calibrating the threshold values for the sensors based on that. I also added averaging for the sensor data so it would be more consistent and precise. You can choose how many values to average in a moving average (right now it is set at 50). I was able to attach everything with rubber bands and took some time to find the best placement for the flex sensor, which I determined to be under the knee, since it was the most accurate (see Second milestone code in Appendix A). There weren't too many technical changes from the first milestone. I also added a button to change the threshold of the flex sensor, a power button, and a potentiometer that changes the frequency of the beeps. 
 
 I had a lot of trouble with the regression for converting the flex sensor's raw value to degrees. I tried linear, quadratic, exponential, and logarithmic regressions. In the end I decided that the regression wouldn't work because only the quadratic regression had a pretty high R squared value (it was ~0.99 compared to the ~0.89 of the rest) and since quadratic equations aren't one-to-one, solving for x in terms of y gave me two seperate equations, which I couldn't put together in a peacewise function without it failing the vertical line test. I also tried flipping the x and y values, but then none of the regressions were accurate. Ultimately, I shifted that to a system with 4 pre-set flex sensor threshold levels, where the user could choose between them with a button. 
 
@@ -229,7 +252,7 @@ Next, I hope to get an accurate linear regression and use more advanced averagin
 
 My project is a knee rehabilitation device. It has two main sensors: an accelerometer and a flex sensor. An accelerometer keeps track of the static acceleration values, and the flex sensor uses variable resistance to measure the angle of bend. It uses these sensors to alert the user (with a buzzer) if their knee is bending inwards or once it passes 90 degrees. 
 
-In my first milestone, I was able to put together the flex sensor, accelerometer, buzzer, and ESP-32 Arduino with a breadboard. I was able to get data from the flex sensor and accelerometer, and code the buzzer to respond differently to both instruments crossing certain thresholds (see first milestone code in the appendix). I was then able to connect the data to my phone through Bluetooth so I could see the real-time values even when the device is connected to a battery pack.
+In my first milestone, I was able to put together the flex sensor, accelerometer, buzzer, and ESP-32 Arduino with a breadboard. I was able to get data from the flex sensor and accelerometer, and code the buzzer to respond differently to both instruments crossing certain thresholds (see first milestone code in Appendix A). I was then able to connect the data to my phone through Bluetooth so I could see the real-time values even when the device is connected to a battery pack.
 
 The main challenge that I faced in this step was getting the accelerometer to connect and send values to my computer. Originally, the accelerometer would just spit out various error codes and junk. In the end, there were a few issues with the initialization of the accelerometer object, which needed to be found in the library since there wasn't any documentation for it.
 
@@ -832,6 +855,324 @@ float averageVals(float* arr, float newVal){ // averages values with a moving fi
   ave += arr[average - 1];
   ave /= average;
   return ave;
+}
+```
+**Music Library:**
+```
+#include <BleSerial.h>
+#include "pitches.h"
+
+// Credit to 2024 HiBit <https://www.hibit.dev> for the note and duration arrays 
+int HymnForTheWeekendNotes[] = {
+  NOTE_GS4, NOTE_GS4, NOTE_GS4, NOTE_G4, NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4,
+  NOTE_G4, NOTE_G4, NOTE_G4, NOTE_G4, NOTE_G4, NOTE_G4,NOTE_F4,NOTE_F4,
+  NOTE_GS4, NOTE_GS4, NOTE_GS4, NOTE_G4, NOTE_F4, NOTE_F4, NOTE_F4, NOTE_F4,
+  NOTE_G4, NOTE_G4, NOTE_G4, NOTE_G4, NOTE_G4,
+
+  NOTE_DS5, NOTE_D5, NOTE_DS5, NOTE_C5, REST,
+  NOTE_DS5, NOTE_D5, REST,
+  NOTE_F5, NOTE_DS5, REST,
+
+  NOTE_DS5, NOTE_D5, NOTE_DS5, NOTE_C5, REST,
+  NOTE_DS5, NOTE_D5, REST,
+  NOTE_F5, NOTE_DS5, REST,
+
+  NOTE_DS5, NOTE_D5, NOTE_DS5, NOTE_C5, REST,
+  NOTE_DS5, NOTE_D5, REST,
+  NOTE_F5, NOTE_DS5, REST,
+
+  NOTE_AS4, NOTE_C5, NOTE_AS5, NOTE_GS5, NOTE_G5, NOTE_G5
+};
+
+int HymnForTheWeekendDurations[] = { //notes are the types so like 4 is a quarter note
+  4, 4, 4, 4, 4, 4, 4, 4,
+  4, 4, 4, 4, 4, 4, 4, 4,
+  4, 4, 4, 4, 4, 4, 4, 4,
+  4, 4, 4, 4, 4,
+
+  4, 4, 4, 2, 4,
+  4, 2, 4,
+  4, 2, 2,
+
+  4, 4, 4, 2, 4,
+  4, 2, 4,
+  4, 2, 2,
+
+  4, 4, 4, 2, 4,
+  4, 2, 4,
+  4, 2, 2,
+
+  4, 4, 4, 2, 2, 1, 0
+};
+
+int EnemyNotes[] = {
+  NOTE_B4, REST,
+  NOTE_FS4, NOTE_FS4, NOTE_B4, NOTE_FS4, NOTE_E4, REST, NOTE_B3,
+
+  NOTE_D4, NOTE_D4, NOTE_D4, NOTE_D4, NOTE_B3, NOTE_B3, NOTE_D4, NOTE_D4, NOTE_D4, NOTE_D4, NOTE_B3, NOTE_B3,
+  NOTE_CS4, NOTE_CS4, NOTE_CS4, NOTE_CS4, NOTE_AS3, NOTE_AS3, NOTE_CS4, NOTE_CS4, NOTE_CS4, NOTE_CS4, NOTE_AS3, NOTE_B3,
+  NOTE_D4, NOTE_D4, NOTE_D4, NOTE_D4, NOTE_B3, NOTE_B3, NOTE_D4, NOTE_D4, NOTE_D4, NOTE_D4, NOTE_B3, NOTE_B3,
+  NOTE_CS4, NOTE_CS4, NOTE_CS4, NOTE_CS4, NOTE_AS3, NOTE_AS3, NOTE_CS4, NOTE_CS4, NOTE_CS4, NOTE_CS4, NOTE_AS3,
+
+  NOTE_B4, NOTE_A4, NOTE_G4, NOTE_D4, NOTE_FS4, NOTE_E4, NOTE_B4,
+  NOTE_B4, NOTE_A4, NOTE_G4, NOTE_D4, NOTE_FS4, NOTE_AS4,
+
+  REST, NOTE_E4, NOTE_FS4, NOTE_E4, NOTE_D4, NOTE_B3,
+  NOTE_D4, NOTE_E4, NOTE_D4, NOTE_E4, NOTE_D4, NOTE_E4, NOTE_D4, NOTE_E4, NOTE_D4, NOTE_E4, NOTE_B4,
+  REST, NOTE_E4, NOTE_FS4, NOTE_E4, NOTE_D4, NOTE_B3,
+  NOTE_D4, NOTE_E4, NOTE_D4, NOTE_E4, NOTE_D4, NOTE_E4, NOTE_B4, REST, NOTE_B3, NOTE_B3, NOTE_B3,
+  NOTE_D4, NOTE_CS4, NOTE_B3, NOTE_FS3, NOTE_E3, NOTE_FS3, NOTE_FS4, NOTE_B4, NOTE_FS4, NOTE_E4,
+  
+  REST
+};
+
+int EnemyDurations[] = {
+  4, 2,
+  4, 8, 4, 8, 4, 2, 8,
+
+  4, 4, 8, 8, 2, 8, 4, 4, 8, 8, 2, 8,
+  4, 4, 8, 8, 2, 8, 4, 4, 8, 8, 2, 8,
+  4, 4, 8, 8, 2, 8, 4, 4, 8, 8, 2, 8,
+  4, 4, 8, 8, 2, 8, 4, 4, 8, 8, 2,
+
+  2, 2, 2, 4, 1, 1, 8,
+  2, 2, 2, 4, 1, 1,
+
+  2, 2, 8, 8, 8, 2,
+  8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 2,
+  2, 2, 8, 8, 8, 2,
+  8, 8, 8, 8, 8, 8, 2, 2, 8, 8, 8,
+  2, 2, 2, 8, 4, 4, 8, 4, 8, 2,
+
+  1, 0
+};
+
+int MemoriesNotes[] = {
+  REST, NOTE_E5, NOTE_D5, NOTE_C5, NOTE_B4, NOTE_A4, NOTE_G4, NOTE_A4, NOTE_B4,
+  NOTE_G5, NOTE_E5, NOTE_F5, NOTE_G5, NOTE_E5, NOTE_F5, NOTE_G5, REST,
+  NOTE_E5, NOTE_C5, NOTE_D5, NOTE_E5, NOTE_C5, NOTE_D5, NOTE_E5, NOTE_C5, NOTE_D5, NOTE_E5, NOTE_D5, NOTE_C5,
+  NOTE_A4, NOTE_A4, REST, NOTE_A4, NOTE_A4, NOTE_G4, NOTE_A4, NOTE_G4, NOTE_G4, REST, NOTE_G4,
+  NOTE_A4, NOTE_A4, NOTE_A4, NOTE_A4, NOTE_C5, NOTE_B4,
+  NOTE_G5, NOTE_E5, NOTE_F5, NOTE_G5, NOTE_E5, NOTE_F5, NOTE_G5,
+  NOTE_E5, NOTE_C5, NOTE_D5, NOTE_E5, NOTE_C5, NOTE_D5, NOTE_E5, NOTE_C5, NOTE_D5, NOTE_E5, NOTE_D5, NOTE_C5,
+  NOTE_A4, NOTE_A4, REST, NOTE_A4, NOTE_A4, NOTE_G4, NOTE_A4, NOTE_G4, NOTE_G4, REST, NOTE_G4, NOTE_G4,
+  NOTE_A4, NOTE_A4, NOTE_A4, REST, NOTE_A4, NOTE_C5, NOTE_B4, NOTE_B4, NOTE_B4, NOTE_B4, NOTE_C5, REST,
+  REST
+};
+
+int MemoriesDurations[] = {
+  4, 2, 2, 2, 2, 2, 2, 2, 4,
+  4, 8, 8, 4, 8, 8, 2, 2,
+  4, 8, 8, 4, 8, 8, 4, 8, 8, 4, 8, 8,
+  4, 8, 8, 4, 8, 8, 8, 8, 2, 8, 8,
+  8, 8, 4, 4, 4, 1,
+  4, 8, 8, 4, 8, 8, 1,
+  4, 8, 8, 4, 8, 8, 4, 8, 8, 4, 8, 8,
+  4, 8, 8, 4, 8, 8, 8, 8, 4, 4, 8, 8,
+  8, 8, 8, 8, 4, 4, 8, 8, 4, 4, 8, 8,
+  1, 0
+};
+
+int ShapeOfYouNotes[] = {
+  NOTE_CS4, NOTE_E4, NOTE_CS4, NOTE_CS4, NOTE_E4,
+  NOTE_CS4, NOTE_CS4, NOTE_E4, NOTE_CS4, NOTE_DS4,
+  NOTE_CS4, NOTE_CS4, NOTE_E4, NOTE_CS4,
+  NOTE_B3,
+  NOTE_CS4, NOTE_E4, NOTE_CS4, NOTE_CS4, NOTE_E4,
+  NOTE_CS4, NOTE_DS4, NOTE_CS4, NOTE_E4,
+  NOTE_B3,
+  NOTE_E4, NOTE_E4, NOTE_E4, NOTE_E4, NOTE_E4, NOTE_E4, NOTE_E4, NOTE_E4, NOTE_E4,
+  NOTE_E4, NOTE_E4, NOTE_E4, NOTE_E4, NOTE_FS4, NOTE_GS4, NOTE_GS4,
+  NOTE_GS4, NOTE_E4, NOTE_FS4, NOTE_B4, NOTE_GS4, NOTE_GS4, NOTE_GS4, NOTE_GS4, NOTE_GS4,
+  NOTE_FS4, NOTE_FS4, NOTE_FS4, NOTE_GS4, NOTE_FS4, NOTE_FS4, NOTE_FS4, NOTE_FS4, NOTE_FS4, NOTE_GS4, NOTE_FS4,
+  NOTE_E4, NOTE_CS4, NOTE_CS4, NOTE_GS4, NOTE_GS4,
+  NOTE_GS4, NOTE_GS4, NOTE_GS4, NOTE_GS4, NOTE_GS4, NOTE_GS4, NOTE_GS4, NOTE_GS4, NOTE_GS4,
+  NOTE_GS4, NOTE_B4, NOTE_GS4, NOTE_GS4, NOTE_FS4, NOTE_FS4, NOTE_E4, NOTE_GS4,
+  NOTE_FS4, NOTE_E4, NOTE_E4, NOTE_E4, NOTE_B4, NOTE_GS4, NOTE_GS4, NOTE_GS4, NOTE_FS4,
+  NOTE_FS4, NOTE_FS4, NOTE_FS4, NOTE_FS4, NOTE_FS4, NOTE_FS4, NOTE_FS4, NOTE_FS4,
+  NOTE_E4, NOTE_CS4, NOTE_CS4, NOTE_CS4, NOTE_CS4, NOTE_CS4,
+  NOTE_GS3, NOTE_B3,
+  NOTE_CS4, NOTE_CS4, NOTE_FS4, NOTE_GS4, NOTE_E4, NOTE_FS4,
+  NOTE_B3,
+  NOTE_E4, NOTE_FS4, NOTE_GS4, NOTE_FS4, NOTE_E4, NOTE_CS4, NOTE_E4, NOTE_GS4,
+  NOTE_FS4, NOTE_E4, NOTE_FS4, NOTE_CS4, NOTE_B4, NOTE_GS4, NOTE_GS4, NOTE_FS4, NOTE_FS4,
+  NOTE_E4, NOTE_CS4, NOTE_E4, NOTE_FS4, NOTE_GS4, NOTE_FS4, NOTE_E4,
+  NOTE_FS4, NOTE_E4, NOTE_CS4, NOTE_CS4,
+  NOTE_B3,
+  NOTE_CS4, NOTE_CS4, NOTE_FS4, NOTE_GS4, NOTE_E4, NOTE_FS4, NOTE_FS4,
+  NOTE_B3,
+  NOTE_FS4, NOTE_GS4, NOTE_FS4, NOTE_E4, NOTE_CS4, NOTE_E4, NOTE_GS4, NOTE_FS4,
+  NOTE_E4, NOTE_FS4, NOTE_CS4, NOTE_B4, NOTE_GS4, NOTE_GS4, NOTE_FS4, NOTE_FS4, NOTE_E4,
+  NOTE_CS4, NOTE_B4, NOTE_GS4, NOTE_GS4, NOTE_FS4, NOTE_FS4, NOTE_E4,
+  NOTE_CS4, NOTE_CS4,
+  NOTE_GS3, NOTE_B3,
+  NOTE_E4, NOTE_FS4, NOTE_GS4, NOTE_FS4, NOTE_E4, NOTE_E4, NOTE_E4, NOTE_FS4, NOTE_FS4,
+  NOTE_E4, NOTE_FS4, NOTE_GS4, NOTE_FS4, NOTE_E4, NOTE_E4, NOTE_E4, NOTE_FS4|
+  NOTE_CS4, NOTE_E4, NOTE_FS4, NOTE_GS4, NOTE_CS4,
+  NOTE_E4, NOTE_E4, NOTE_FS4, NOTE_FS4, NOTE_E4, NOTE_FS4, NOTE_GS4,
+  NOTE_FS4, NOTE_E4, NOTE_E4, NOTE_FS4, NOTE_CS4, NOTE_CS4,
+  NOTE_FS4, NOTE_GS4, NOTE_B4, NOTE_GS4, NOTE_FS4, NOTE_E4, NOTE_E4, NOTE_FS4,
+  NOTE_E4, NOTE_FS4, NOTE_GS4, NOTE_FS4, NOTE_E4, NOTE_E4, NOTE_FS4,
+  NOTE_CS4, NOTE_CS4, NOTE_CS4, NOTE_CS4, NOTE_CS4, NOTE_E4, NOTE_FS4, NOTE_GS4, NOTE_CS4, NOTE_E4,
+  NOTE_FS4, NOTE_E4, NOTE_FS4, NOTE_E4, NOTE_FS4, NOTE_GS4,
+  NOTE_FS4, NOTE_E4, NOTE_E4, NOTE_FS4, NOTE_CS4, NOTE_CS4, NOTE_CS4, NOTE_E4, NOTE_E4,
+  NOTE_FS4, NOTE_FS4, NOTE_GS4, NOTE_GS4,
+  NOTE_E4, NOTE_FS4, NOTE_GS4, NOTE_FS4, NOTE_E4, NOTE_E4, NOTE_FS4, NOTE_CS4, NOTE_CS4,
+  NOTE_CS4, NOTE_E4, NOTE_E4, NOTE_FS4, NOTE_FS4, NOTE_GS4,
+  NOTE_GS4, NOTE_E4, NOTE_FS4, NOTE_GS4, NOTE_FS4,
+  NOTE_E4, NOTE_E4, NOTE_FS4, NOTE_CS4, NOTE_CS4, NOTE_CS4, NOTE_E4, NOTE_E4,
+  NOTE_FS4, NOTE_FS4, NOTE_GS4, NOTE_GS4,
+  NOTE_E4, NOTE_FS4, NOTE_GS4, NOTE_FS4, NOTE_E4, NOTE_E4, NOTE_FS4, NOTE_CS4, NOTE_CS4,
+  NOTE_CS4, NOTE_CS4, NOTE_CS4, NOTE_CS4, NOTE_E4, NOTE_FS4, NOTE_GS4, NOTE_CS4, NOTE_E4, NOTE_FS4,
+  NOTE_CS4,
+};
+
+
+int ShapeOfYouDurations[] = {
+  2,2,4,2,2,4,2,2,4,2,2,2,2,2,2,2,2,4,2,2,4,2,2,2,2,8,8,4,4,8,8,8,8,8,8,8,2,8,8,4,2,8,8,4,8,8,8,4,4,8,8,8,8,8,4,8,4,8,8,8,8,4,2,8,8,8,8,4,8,8,8,8,8,8,2,8,4,8,8,8,8,8,2,4,8,8,2,4,8,8,8,8,8,8,2,8,8,4,4,4,8,8,2,4,4,2,4,2,2,4,8,8,8,2,2,8,4,8,4,4,4,4,8,8,8,8,2,8,8,4,8,8,4,2,8,4,8,4,4,4,4,2,2,2,2,4,8,8,8,2,2,2,4,8,4,4,4,4,8,8,8,8,2,8,8,4,8,8,4,2,8,8,4,8,8,4,2,2,4,2,8,8,4,8,8,4,8,8,2,8,8,4,8,8,4,8,8,2,8,8,4,4,4,8,8,2,8,8,4,8,8,8,4,8,2,4,4,8,8,4,4,8,2,8,8,4,4,4,8,8,4,8,8,8,8,8,8,4,4,4,4,8,2,8,8,4,8,8,8,4,8,4,4,4,4,4,4,4,2,8,8,4,8,8,8,4,8,4,4,4,4,4,4,4,2,8,8,4,8,8,8,4,8,4,4,4,4,4,4,4,2,8,8,4,8,8,8,4,8,4,8,8,8,8,8,8,4,4,4,4,2,0
+};
+
+int HarryPotterNotes[] = {
+  REST, NOTE_D4,
+  NOTE_G4, NOTE_AS4, NOTE_A4,
+  NOTE_G4, NOTE_D5,
+  NOTE_C5, 
+  NOTE_A4,
+  NOTE_G4, NOTE_AS4, NOTE_A4,
+  NOTE_F4, NOTE_GS4,
+  NOTE_D4, 
+  NOTE_D4,
+  
+  NOTE_G4, NOTE_AS4, NOTE_A4,
+  NOTE_G4, NOTE_D5,
+  NOTE_F5, NOTE_E5,
+  NOTE_DS5, NOTE_B4,
+  NOTE_DS5, NOTE_D5, NOTE_CS5,
+  NOTE_CS4, NOTE_B4,
+  NOTE_G4,
+  NOTE_AS4,
+   
+  NOTE_D5, NOTE_AS4,
+  NOTE_D5, NOTE_AS4,
+  NOTE_DS5, NOTE_D5,
+  NOTE_CS5, NOTE_A4,
+  NOTE_AS4, NOTE_D5, NOTE_CS5,
+  NOTE_CS4, NOTE_D4,
+  NOTE_D5, 
+  REST, NOTE_AS4,  
+  
+  NOTE_D5, NOTE_AS4,
+  NOTE_D5, NOTE_AS4,
+  NOTE_F5, NOTE_E5,
+  NOTE_DS5, NOTE_B4,
+  NOTE_DS5, NOTE_D5, NOTE_CS5,
+  NOTE_CS4, NOTE_AS4,
+  NOTE_G4
+};
+
+int HarryPotterDurations[] = {
+  2, 4,
+  4, 8, 4,
+  2, 4,
+  2, 
+  2,
+  4, 8, 4,
+  2, 4,
+  1, 
+  4,
+  
+  4, 8, 4,
+  2, 4,
+  2, 4,
+  2, 4,
+  4, 8, 4,
+  2, 4,
+  1,
+  4,
+   
+  2, 4,
+  2, 4,
+  2, 4,
+  2, 4,
+  4, 8, 4,
+  2, 4,
+  1, 
+  4, 4,  
+  
+  2, 4,
+  2, 4,
+  2, 4,
+  2, 4,
+  4, 8, 4,
+  2, 4,
+  1
+};
+
+int LivingOnAPrayerNotes[] = {
+  NOTE_B3, NOTE_D4, NOTE_E4, NOTE_E4,
+  NOTE_B3, NOTE_D4, NOTE_E4, NOTE_E4,
+  NOTE_B3, NOTE_D4, NOTE_E4, NOTE_E4,
+
+  NOTE_B3, NOTE_D4, NOTE_G4, NOTE_G4, NOTE_G4, NOTE_FS4, NOTE_E4, NOTE_D4, NOTE_E4, NOTE_E4, NOTE_D4,
+  NOTE_B3,
+
+  NOTE_G4, NOTE_G4, NOTE_FS4, NOTE_E4, NOTE_E4, NOTE_FS4,
+  NOTE_G4, NOTE_FS4, NOTE_E4, NOTE_E4, NOTE_B3,
+  NOTE_A3, NOTE_G3,
+
+  REST
+};
+
+int LivingOnAPrayerDurations[] = {
+  8, 8, 8, 8,
+  8, 8, 8, 8,
+  8, 8, 8, 8,
+
+  8, 8, 8, 8, 8, 8, 8, 8, 8, 16, 16,
+  1,
+
+  8, 8, 8, 8, 4, 8,
+  4, 4, 8, 4, 4,
+  8, 1,
+
+  1
+};
+
+// the astrisk means it is a pointer so in this case these are pointer arrays --> unlike java names aren't automatically pointers so the * specifies it 
+int * melodies[] = {HymnForTheWeekendNotes, EnemyNotes, MemoriesNotes, ShapeOfYouNotes, HarryPotterNotes, LivingOnAPrayerNotes};
+int * durations[] = {HymnForTheWeekendDurations, EnemyDurations, MemoriesDurations, ShapeOfYouDurations, HarryPotterDurations, LivingOnAPrayerDurations};
+
+void printMusicMenu(BleSerial *ble){ // I just made this a seperate fuction in this library to keep it a bit cleaner - just prints the music options to BleSerial
+  ble->println("There are a few music options you can choose from: "); // since ble is a pointer you need -> not . becuase its basically telling it to go to the address it is pointing to on the stack and then to the fuction
+  ble->println("Track 0 - Hymn For The Weekend by Coldplay");
+  ble->println("Track 1 - Enemy by Imagine Dragons");
+  ble->println("Track 2 - Memories by Maroon 5");
+  ble->println("Track 3 - Shape of You by Ed Sheeran");
+  ble->println("Track 4 - Harry Potter Theme Song");
+  ble->println("Track 5 - Livin on a Prayer by Bon Jovi");
+}
+
+String getSong(int trackNum){ //returns the song info of a given track number
+  switch (trackNum){
+    case 0: 
+    return "Hymn For The Weekend by Coldplay";
+    break;
+    case 1:
+    return "Enemy by Imagine Dragons";
+    break;
+    case 2:
+    return "Memories by Maroon 5";
+    break;
+    case 3:
+    return "Shape of You by Ed Sheeran";
+    break;
+    case 4:
+    return "Harry Potter Theme Song";
+    break;
+    case 5:
+    return "Livin on a Prayer by Bon Jovi";
+    break;
+  }
 }
 ```
 
