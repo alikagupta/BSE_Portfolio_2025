@@ -8,31 +8,7 @@ My project is a device that goes on your knee to make knee rehabilitation easier
 | Alika G | Woodside Priory | Electrical Engineering | Incoming Junior
 
 ![Headstone Image](logo.svg)
-  
-<!-- # Final Milestone
 
-**Don't forget to replace the text below with the embedding for your milestone video. Go to Youtube, click Share -> Embed, and copy and paste the code to replace what's below.**
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/F7M7imOVGug" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-
-For your final milestone, explain the outcome of your project. Key details to include are:
-- What you've accomplished since your previous milestone
-- What your biggest challenges and triumphs were at BSE
-- A summary of key topics you learned about
-- What you hope to learn in the future after everything you've learned at BSE
-
-# Modifications
-My modifications included
-- making a Bluetooth user interface 
-- adding a speaker and getting it to run in parallel with my regular code
-- adding a wall-sitting mode
-- making many attributes customizable 
-- adding a power button and threshold level button 
-- adding a second buzzer and a potentiometer 
-- adding a vibration motor
-- adding a neopixel strip
-
--->
 # How the components work
 
 ## Flex Sensor:
@@ -202,6 +178,34 @@ To convert this data, I used a Madgwick filter, which takes in the accelerometer
 
 ### Calibration
 
+<!-- # Final Milestone
+
+**Don't forget to replace the text below with the embedding for your milestone video. Go to Youtube, click Share -> Embed, and copy and paste the code to replace what's below.**
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/F7M7imOVGug" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+My final milestone wasn't very technologically complex, but was honestly one of the most frustrating yet important to finish: sewing and soldering. I started with soldering. I first moved the connection from my breadboard to my first PCB, which was honestly pretty relaxing. Next, I plotted out where on the sleeve I wanted things to be. I knew I wanted the flex sensor in the back, for the best readings, and the PCB on the outer side for easy access to the buttons and potentiometer. I also wanted the LED on the top, where it would be easily visible, and the accelerometer on the upper outer thigh, as that is where you get the most change in data when squatting. Based on these restrictions, I figured out where the rest of the components needed to be placed. Next, I sewed a pouch for the battery pack, and added  Velcro on it and the knee compression sleeve to make it detachable. This means you can get rid of the bulkiest item if you aren't using it, or attach it elsewhere. It also allows the user to replace or recharge the battery pack easily, without having to worry about the whole device. 
+
+I also had to recalibrate my flex sensor and accelerometer. My flex sensor would have needed 
+
+One major challenge I was having was solder joints coming apart. While this was somewhat annoying in the start, it was a pretty easy fix originally. It also wasn't happening much while all the components were just sitting on the table. When I ended up sewing them, that's when many of the connections broke, and because the boards were sewn on, I had to replace them with surface mounts. The issue was that when you take the sleeve off or put it on, it stretches, and that was stressing the joints. I tried to prevent this by unplugging the connections that often came out when transferring the sleeve, but a few times I accidentally forgot or would make adjustments to the sleeve position and some connections broke. In the end, I got so fed up that I decided to epoxy all the connections on my main PCB. That mostly fixed the problem, except for one joint, where the epoxy held the solder joint, but the joint just broke higher in the wire. After soldering that joint back together, everything held. 
+
+- A summary of key topics you learned about
+- What you hope to learn in the future after everything you've learned at BSE
+
+# Modifications
+My modifications included:
+- Making a Bluetooth user interface and adjusting most things to be customizable though it
+- Adding a speaker and getting it to run in parallel with my regular code
+- Creating a wall-sitting mode
+- Adding a neopixel strip with status bar and pastel rainbow modes 
+- Adding assorted small components: Vibration Motor, Potentiometer, Power Button, Angle level button, Second Buzzer
+
+## Making a Bluetooth user interface and adjusting most things to be customizable though it
+Rehab is a very dynamic process; it is based on your needs and abilities in the moment. I wanted to address 
+
+A challenge I encountered in this portion of the project was that at one point, the Bluetooth would randomly disconnect and not be able to print the menu or else commands. It turned out that these were two separate issues. First, the inability to print the menu was because the Bluetooth can only take a certain number of print statements in succession (~ 15) before it's too much for it. The solution was pretty simple and just involved putting multiple lines of printing into one statement and just using \n to separate new lines.
+-->
 
 # Second Milestone
 
@@ -225,7 +229,7 @@ Next, I hope to get an accurate linear regression and use more advanced averagin
 
 My project is a knee rehabilitation device. It has two main sensors: an accelerometer and a flex sensor. An accelerometer keeps track of the static acceleration values, and the flex sensor uses variable resistance to measure the angle of bend. It uses these sensors to alert the user (with a buzzer) if their knee is bending inwards or once it passes 90 degrees. 
 
-In my first milestone, I was able to put together the flex sensor, accelerometer, buzzer, and ESP-32 Arduino with a breadboard. I was able to get data from the flex sensor and accelerometer, and code the buzzer to respond differently to both instruments crossing certain thresholds (see first milestone code in the appendix). I was then able to connect the data to my phone through Bluetooth so I can see the real-time values even when the device is connected to a battery pack.
+In my first milestone, I was able to put together the flex sensor, accelerometer, buzzer, and ESP-32 Arduino with a breadboard. I was able to get data from the flex sensor and accelerometer, and code the buzzer to respond differently to both instruments crossing certain thresholds (see first milestone code in the appendix). I was then able to connect the data to my phone through Bluetooth so I could see the real-time values even when the device is connected to a battery pack.
 
 The main challenge that I faced in this step was getting the accelerometer to connect and send values to my computer. Originally, the accelerometer would just spit out various error codes and junk. In the end, there were a few issues with the initialization of the accelerometer object, which needed to be found in the library since there wasn't any documentation for it.
 
