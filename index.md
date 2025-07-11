@@ -749,7 +749,6 @@ void colorWipe(uint32_t color, int wait) {                        // makes the s
 #include <MadgwickAHRS.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_LSM6DS33.h>
-#include <Adafruit_LIS3MDL.h>
 
 // making objects
 Adafruit_LSM6DS33 lsm6ds33;
