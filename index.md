@@ -174,6 +174,35 @@ I wanted to keep my code cleaner, so when I realized I would need huge arrays of
 ## Neopixel Strip:
 A Neopixel strip is just a bunch of Neopixels chained together. Each Neopixel has a red LED, green LED, and blue LED that shine at different brightnesses to make a rainbow of colors. Each Neopixel receives 3 bytes of information (8 bits for each color) on its data pin and gets 5V from its power pin, with its last pin being ground. These pins of each Neopixel are attached together in a Neopixel strip. You just need to connect the wires from the neopixel at the start end, with power to the ESP-32's Vin, ground to ground, and the data pin to one of the digital pins on the ESP-32. I then tested the strip with some basic code (see Neopixel Strip Test Code in the appendix) before integrating it into my project. 
 
+## Accelerometer:
+
+
+<div align="center">
+  <img src="" width="40%" height="40%">
+</div>
+
+<div align="center"> 
+  
+  <i>Figure 10: </i>
+</div>
+
+### Converting acceleration to position
+While you can try to detect good vs. bad squats with acceleration, it's not very consistent, as I saw when I originally tried. The problem is that acceleration is dependent on how fast you move, so while having a certain Z-axis acceleration on a slower squat would mean you had bad form, having that same acceleration on a faster squat would be fine and expected, even with perfect form. To address this, I used my accelerometer to instead describe its 3D position. To do this, I used the measures roll, pitch, and yaw. These are measurements of rotation often used to describe the 3D position of an object, like the nose of a plane. As seen in Figure 11, each measures rotation along a specific axis: roll measures along the longitudinal axis, pitch along the lateral axis, and yaw along the perpendicular axis.
+
+<div align="center">
+  <img src="Roll-Yaw-Pitch.png" width="40%" height="40%">
+</div>
+
+<div align="center"> 
+  
+  <i>Figure 11: a diagram of the axis of roll, pitch, and yaw from [smlease](https://www.smlease.com/entries/mechanical-design-basics/what-is-the-difference-between-roll-pitch-yaw-aircraft-motions/)</i>
+</div>
+
+To convert this data, I used a Madgwick filter, which takes in the accelerometer and gyroscopes' values for all 3 axes to find the values of roll, pitch, and yaw. Arduino has a `MadgwickAHRS.h` library that does this.
+
+### Calibration
+
+
 # Second Milestone
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/kZ0Yr-viwl8?si=Qh_XLWgTdqZkQEg_" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
@@ -681,6 +710,124 @@ void colorWipe(uint32_t color, int wait) {                        // makes the s
     strip.show();
     delay(wait);
   }
+}
+```
+
+**Testing Accelerometer Calibration Code:**
+```
+// importing libraries
+#include <MadgwickAHRS.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_LSM6DS33.h>
+#include <Adafruit_LIS3MDL.h>
+
+// making objects
+Adafruit_LSM6DS33 lsm6ds33;
+Madgwick filter; 
+
+// declaring varibles 
+const int average = 3;
+const int FlexPin = 33;
+int buzz = -30;
+
+float roll;
+float pitch;
+float yaw;
+float rolls[average];
+float pitchs[average];
+float yaws[average];
+
+// flex value stuff
+float FlexValue;
+float b[3] = {0.13062385854433664, 0.2612477170886733, 0.13062385854433664};
+float a[3] = {1.0, -0.7450366885405569, 0.2675321227179034};
+float FlexIns[2] = {0,0};
+float FlexOuts[2]= {0,0};
+
+void setup() {
+  // general setup
+  pinMode(FlexPin, INPUT);
+  filter.begin(20); // in Hz -- make sure it matches how much your loop is running 
+  Serial.begin(115200);
+
+  // accelerometer setup
+  lsm6ds33.begin_I2C ();
+  lsm6ds33.setAccelRange(LSM6DS_ACCEL_RANGE_2_G);
+  lsm6ds33.setAccelDataRate(LSM6DS_RATE_52_HZ); 
+  lsm6ds33.setGyroDataRate(LSM6DS_RATE_52_HZ);
+}
+
+void loop() {
+
+  // getting the data
+  sensors_event_t accel;
+  sensors_event_t gyro;
+  sensors_event_t temp;
+  lsm6ds33.getEvent(&accel, &gyro, &temp);
+
+  // converting from radians to degrees
+  float gx = gyro.gyro.x * 180.0 / PI;
+  float gy = gyro.gyro.y * 180.0 / PI;
+  float gz = gyro.gyro.z * 180.0 / PI;
+
+  // passing in values
+  filter.updateIMU(gx, gy, gz, accel.acceleration.x, accel.acceleration.y,accel.acceleration.z);
+
+  // getting values 
+  roll = filter.getRoll();
+  pitch = filter.getPitch();
+  yaw = filter.getYaw();
+
+  // averaging data
+  roll = averageVals(rolls, roll);
+  pitch = averageVals(pitchs, pitch);
+  yaw = averageVals(yaws, yaw);
+
+  // flex value getting and filtering
+  FlexValue = -0.212069*(analogRead(FlexPin))+586.55172;
+  float rawFlexValue = FlexValue;
+  FlexValue = b[0]*FlexValue + b[1]*FlexIns[1] + b[2]*FlexIns[0] - a[1]*FlexOuts[1] -a[2]*FlexOuts[0]; // biquad filter
+  FlexIns[0] = FlexIns[1]; 
+  FlexIns[1] = rawFlexValue;
+  FlexOuts[0] = FlexOuts[1];
+  FlexOuts[1] = FlexValue;
+  FlexValue = 180 - FlexValue;
+  
+  // reacting
+  if(FlexValue < 90){
+    if(pitch < -58){
+      buzz = 130;
+    } else{
+      buzz = -30;
+    } 
+  } else {
+     buzz = -30;
+  }
+
+  //printing
+  Serial.print(roll);
+  Serial.print(",");
+  Serial.print(pitch);
+  Serial.print(",");
+  Serial.print(yaw);
+  Serial.print(",");
+  Serial.print(FlexValue);
+  Serial.print(",");
+  Serial.println(buzz);
+  
+  delay(50);
+}
+
+float averageVals(float* arr, float newVal){ // averages values with a moving finite average 
+  float ave = 0.0;
+  for (int i = 0; i < (average-1); i++){
+    arr[i] = arr[i+1];
+    ave += arr[i];
+  }
+  arr[average - 1] = newVal;
+  ave += arr[average - 1];
+  ave /= average;
+  return ave;
 }
 ```
 
