@@ -191,9 +191,8 @@ Now that I had my Euler angles, I moved to finding out how to detect a bad vs a 
 
 As you can see, roll and yaw (blue and red) were not very consistent. By far the best measure of whether a squat was occurring was, expectedly, the angle of the knee (cyan). I also noticed that the pitch (green) was the best indication of a good vs. bad squat. As you can see in the figure, during a bad squat, the pitch remained roughly flat, while on a good squat, the pitch significantly rose (look at the arrow). Using the angle of the knee in conjunction with pitch, in a nested if statement, to distinguish bad and good squats worked successfully, as seen by the fact that the buzz (magenta) only went up for the bad squat.
 
-<!-- # Final Milestone
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/F7M7imOVGug" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+# Final Milestone
+<iframe width="560" height="315" src="https://www.youtube.com/embed/HtySURIBo24?si=KRRDA3KrkLl0P2vs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 My final milestone wasn't very technologically complex, but was honestly one of the most frustrating yet important to finish: sewing and soldering. I started with soldering. I first moved the connection from my breadboard to my first PCB, which was honestly pretty relaxing. Next, I plotted out where on the sleeve I wanted things to be. I knew I wanted the flex sensor in the back, for the best readings, and the PCB on the outer side for easy access to the buttons and potentiometer. I also wanted the LED on the top, where it would be easily visible, and the accelerometer on the upper outer thigh, as that is where you get the most change in data when squatting. Based on these restrictions, I figured out where the rest of the components needed to be placed. Next, I sewed a pouch for the battery pack, and added  Velcro on it and the knee compression sleeve to make it detachable. This means you can get rid of the bulkiest item if you aren't using it, or attach it elsewhere. It also allows the user to replace or recharge the battery pack easily, without having to worry about the whole device. I then finalized and soldered my second PCB. This PCB was much harder as it was very small and was a bad quality flex PCB, with traces that were only on one side and easily lifted off. It also didn't have pre-made connections like the first PCB. I then moved on to sewing. I sewed all the components in through their holes (I made loops for the flex sensor, and attached the speaker to foam with two-part epoxy adhesive and then sewed the foam in). 
 
@@ -201,13 +200,20 @@ I also had to recalibrate my flex sensor and accelerometer. My flex sensor might
 
 One major challenge I was having was solder joints coming apart. While this was somewhat annoying in the start, it was a pretty easy fix originally. It also wasn't happening much while all the components were just sitting on the table. When I ended up sewing them, that's when many of the connections broke, and because the boards were sewn on, I had to replace them with surface mounts. The issue was that when you take the sleeve off or put it on, it stretches, and that was stressing the joints. I tried to prevent this by unplugging the connections that often came out when transferring the sleeve, but a few times I accidentally forgot or would make adjustments to the sleeve position, and some connections broke. In the end, I got so fed up that I decided to epoxy all the connections on my main PCB. That mostly fixed the problem, except for one joint, where the epoxy held the solder joint, but the joint just broke higher in the wire. After soldering that joint back together, everything held. Another challenge was that I accidentally hurt my knee during the recalibration of the accelerometer. When I fell, I accidentally damaged my ESP-32 and had to ultimately switch to a new one.
 
-- A summary of key topics you learned about + challenges
+During my time at Bluestamp, I was able to learn a lot. The specific concepts I learned that stood out to me were: 
+- Data Filtering (Fourier transform, Biquad filter)
+- Parallel tasks (Free RTOS, Assigning tasks to cores, How stacks work)
+- Audio Amp (How the components work)
+- How to get + use roll, pitch, and yaw from an accelerometer (Madgwick filter)
+- How C++ deals with pointers, addresses, and libraries
+- Applications of optimization 
+Beyond that, I also gained a lot of knowledge on how to approach problems, read/find documentation, and troubleshoot.
 
 After Bluestamp, I hope to continue with engineering, using what I learned here to make my own projects (and troubleshoot them).
 
--->
-
 # Modifications
+<iframe width="560" height="315" src="https://www.youtube.com/embed/RYRgMUZovEs?si=2CZqgzFD0eGt0jXz" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
 My modifications included:
 - Making a Bluetooth user interface and adjusting most things to be customizable through it
 - Adding a speaker and getting it to run in parallel with my regular code
