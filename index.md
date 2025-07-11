@@ -219,6 +219,12 @@ I also had to recalibrate my flex sensor and accelerometer. My flex sensor might
 
 One major challenge I was having was solder joints coming apart. While this was somewhat annoying in the start, it was a pretty easy fix originally. It also wasn't happening much while all the components were just sitting on the table. When I ended up sewing them, that's when many of the connections broke, and because the boards were sewn on, I had to replace them with surface mounts. The issue was that when you take the sleeve off or put it on, it stretches, and that was stressing the joints. I tried to prevent this by unplugging the connections that often came out when transferring the sleeve, but a few times I accidentally forgot or would make adjustments to the sleeve position, and some connections broke. In the end, I got so fed up that I decided to epoxy all the connections on my main PCB. That mostly fixed the problem, except for one joint, where the epoxy held the solder joint, but the joint just broke higher in the wire. After soldering that joint back together, everything held. Another challenge was that I accidentally hurt my knee during the recalibration of the accelerometer. When I fell, I accidentally damaged my ESP-32 and had to ultimately switch to a new one.
 
+![picture of circuit](FinalShem.png)
+<div align="center"> 
+  
+  <i>Figure 13: A schematic of my final circuitry, made on Cirkit designer</i>
+</div>
+
 # Modifications
 <iframe width="560" height="315" src="https://www.youtube.com/embed/RYRgMUZovEs?si=2CZqgzFD0eGt0jXz" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
@@ -260,7 +266,7 @@ Next, I hope to get an accurate linear regression and use more advanced averagin
 ![picture of circuit](Milestone2shem.png)
 <div align="center"> 
   
-  <i>Figure _: A schematic of my circuitry at milestone 2, made on Cirkit designer</i>
+  <i>Figure 14: A schematic of my circuitry at milestone 2, made on Cirkit designer</i>
 </div>
 
 # First Milestone
@@ -278,7 +284,7 @@ Next, I hope to place all of this onto the knee compression sleeve and change th
 ![picture of circuit](Milestone1Shema.png)
 <div align="center"> 
   
-  <i>Figure _: A schematic of my circuitry at milestone 1, made on Cirkit designer</i>
+  <i>Figure 15: A schematic of my circuitry at milestone 1, made on Cirkit designer</i>
 </div>
 
 # Appendix A: Code
