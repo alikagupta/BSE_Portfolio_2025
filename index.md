@@ -6,7 +6,10 @@ My project is a device that goes on your knee to make knee rehabilitation easier
 |:--:|:--:|:--:|:--:|
 | Alika G | Woodside Priory | Electrical Engineering | Incoming Junior
 
-![Headstone Image](Headstone.png)
+<div align="center">
+  <img src="Headstone.png" width="70%" height="70%" alt="Picture of me with device">
+</div>
+
 
 # Final Reflection
 
