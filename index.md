@@ -174,7 +174,7 @@ While you can try to detect good vs. bad squats with acceleration, it's not very
 
 <div align="center">
   
-  <i>Figure 11: a diagram of the axis of roll, pitch, and yaw from smlease.</i>
+  <i>Figure 11: a diagram of the axis of roll, pitch, and yaw from <a href="https://www.smlease.com/entries/mechanical-design-basics/what-is-the-difference-between-roll-pitch-yaw-aircraft-motions/">smlease.</a> </i>
 </div>
 
 To convert this data, I used a Madgwick filter, which takes in the accelerometer and gyroscopes' readings on all three axes to find the values of roll, pitch, and yaw. Arduino has a `MadgwickAHRS.h` library that does this. A Madgwick filter basically uses the data from the gyroscope, which measures rotational motion, to try to make a quaternion (a more complex way of noting orientation than Euler angles, but less susceptible to gimbal lock, which is when you lose a degree of freedom). The filter then uses that to predict the direction of gravity and compares those values to what the accelerometer provides, and uses that to incrementally fix the filter, in what's called a gradient descent, which helps reduce gyroscope drift over time. The library then has functions to get the pitch, roll, and yaw from the quaternion. 
@@ -1837,4 +1837,3 @@ Next, I will be moving on to my intensive project: the knee rehabilitation devic
 - [Guide on Potentiometers](https://randomnerdtutorials.com/electronics-basics-how-a-potentiometer-works/)
 - [Frequency and duration info for some popular songs](https://www.hibit.dev/posts/62/playing-popular-songs-with-arduino-and-a-buzzer)
 - [Guide on parallel multitasking on a esp-23 with FreeRTOS](https://www.circuitstate.com/tutorials/how-to-write-parallel-multitasking-applications-for-esp32-using-freertos-arduino/)
-- [smlease](https://www.smlease.com/entries/mechanical-design-basics/what-is-the-difference-between-roll-pitch-yaw-aircraft-motions/)
