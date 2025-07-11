@@ -160,7 +160,7 @@ An accelerometer works by detecting small changes caused by the movement of a sm
 
 <div align="center"> 
   
-  <i>Figure 10: Diagram of the inside of an accelerometer from [A conference paper by Amerini et al.](https://www.researchgate.net/publication/308074268_Robust_smartphone_fingerprint_by_mixing_device_sensors_features_for_mobile_strong_authentication) with labeled parts</i>
+  <i>Figure 10: Diagram of the inside of an accelerometer from <a href="https://www.researchgate.net/publication/308074268_Robust_smartphone_fingerprint_by_mixing_device_sensors_features_for_mobile_strong_authentication">A conference paper by Amerini et al.</a> with labeled parts</i>
 </div>
 
 ### Converting acceleration to orientation
