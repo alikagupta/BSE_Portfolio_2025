@@ -170,7 +170,7 @@ While you can try to detect good vs. bad squats with acceleration, it's not very
   <img src="Roll-Yaw-Pitch.png" width="40%" height="40%">
 </div>
 
-<div align="center"> 
+<div align="center">
   
   <i>Figure 11: a diagram of the axis of roll, pitch, and yaw from [smlease](https://www.smlease.com/entries/mechanical-design-basics/what-is-the-difference-between-roll-pitch-yaw-aircraft-motions/).</i>
 </div>
@@ -205,29 +205,33 @@ One major challenge I was having was solder joints coming apart. While this was 
 
 After Bluestamp, I hope to continue with engineering, using what I learned here to make my own projects (and troubleshoot them).
 
+-->
+
 # Modifications
 My modifications included:
-- Making a Bluetooth user interface and adjusting most things to be customizable though it
+- Making a Bluetooth user interface and adjusting most things to be customizable through it
 - Adding a speaker and getting it to run in parallel with my regular code
-- Creating a wall-sitting mode
+- Creating a wall sitting mode
 - Adding a neopixel strip with status bar and pastel rainbow modes 
 - Adding assorted small components: Vibration Motor, Potentiometer, Power Button, Angle level button, Second Buzzer
 
-## Making a Bluetooth user interface and adjusting most things to be customizable though it
-Rehab is a very dynamic process; it is based on your needs and abilities in the moment. I wanted to address 
+## Making a Bluetooth user interface and adjusting most things to be customizable through it
+Rehab is a very dynamic process; it is based on your needs and abilities in the moment. I wanted to address this by letting the user choose things like at what angle a squat is complete. After that, I just kept wanting to add more customizability, like muting the buzzer, and as I started adding other components, things like switching music. I ended up with over 25 commands for the user to call through Bluetooth. The fundamental structure of the commands is: the Bluetooth sends individual decimal values of the input to the computer, then it gets converted to a string, then that string is made all lowercase and passed through an if-else ladder of all the possible commands (and a command not found error as the else). The user can type menu to see all the possible commands and their explanations (the error statement and typing hi or hello all direct you to the menu).
 
 A challenge I encountered in this portion of the project was that at one point, the Bluetooth would randomly disconnect and not be able to print the menu or else commands. It turned out that these were two separate issues. First, the inability to print the menu was because the Bluetooth can only take a certain number of print statements in succession (~ 15) before it's too much for it. The solution was pretty simple and just involved putting multiple lines of printing into one statement and just using `\n` to separate new lines. The second problem was much more confusing to solve. Ultimately, adding a `continue;` to the end of every if, else if, or else statement in the if-else-if ladder for Bluetooth fixed it.
 
 ## Adding a speaker and getting it to run in parallel with my regular code
 I decided that it would be fun to have music playing (and I wanted to learn how to make an audio amp), so I wanted to add a speaker. I first made the circuit and ran test code (see Speaker section in How the components work). As I was transferring the speaker's music code to my main project, I realized the delays of the speaker would mess the whole project up, so I researched how to run things in parallel and ended up successfully using FreeRTOS to do this (see Running two loops concurrently section in How the components work). I then added some basic commands like play and pause music, but I still wanted to add more customizability. This would be very bulky to just add into my code, so I created a separate library for it instead (see the Creating your own library section in How the components work). I then added Bluetooth commands to do things like change songs or see what song is playing.
 
-## Creating a wall-sitting mode
+## Creating a wall sitting mode
+Wall sits were probably the most helpful exercise for my knee. I asked my PT if I could only do one exercise consistently, which one should I do, and she said wall sits. Adding a wall sit mode was pretty straightforward. Once you start the wall sit, it just stops when it detects you get up (simple for the user), and it beeps when you finish your goal. You can set your goal, start the wall sit, and get your time at any point. 
 
 ## Adding a neopixel strip with status bar and pastel rainbow modes 
+I was pretty familiar with neopixels going into this (See the Neopixel Strip section of How the components work for details). I just wanted to add neopixels for a status bar, but then I realized I can only have a status bar when the user is in counting squats or wall sitting mode, so I decided to add a looping pastel rainbow for fun in the off time. The user can turn the strip on and off, but the status bar mode is automatically engaged and disabled.
 
 ## Adding assorted small components: Vibration Motor, Potentiometer, Power Button, Angle level button, Second Buzzer
 These were all pretty easy to add. They are all easily accessible on the main PCB. The Potentiometer, Vibration Motor, and Buzzer have sections in How the components work. The buttons work by connecting when you push down, sending a high signal to the Arduino. 
--->
+
 
 # Second Milestone
 
