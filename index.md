@@ -21,9 +21,8 @@ During my time at Bluestamp, I was able to learn a lot. The specific concepts I 
 - How to get + use roll, pitch, and yaw from an accelerometer (Madgwick filter)
 - How C++ deals with pointers, addresses, and libraries
 - Applications of optimization 
-Beyond that, I also gained a lot of knowledge on how to approach problems, read/find documentation, and troubleshoot.
 
-After Bluestamp, I hope to continue with engineering, using what I learned here to make my own projects (and troubleshoot them).
+Beyond that, I also gained a lot of knowledge on how to approach problems, read and write documentation, and troubleshoot. After Bluestamp, I hope to continue with engineering, using what I learned here to make my own projects (and troubleshoot them).
 
 # How the components work
 
