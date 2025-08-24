@@ -1,5 +1,5 @@
 # Knee Rehabilitation Device
-Knee injuries account for millions of doctor visits a year. They can be debilitating and seriously impact the quality of life. Recovery isn't always fun.
+Knee injuries account for millions of doctor visits a year. They can be debilitating and seriously impact the quality of life. Recovery can be a long, hard process.
 My project was to create a device that goes on your knee to make knee rehabilitation easier, safer, and more enjoyable. It has modes to track different exercises like squats and wall sits, plays music, and even has captivating LEDs. It incorporates lots of cool data science, computer science, and electrical engineering. The device is controlled by the user through a Bluetooth interface where they can give simple commands from things like setting the music or finding the angle their knee is at.
 
 | **Engineer** | **School** | **Area of Interest** | **Grade** |
