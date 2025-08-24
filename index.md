@@ -6,7 +6,6 @@ My project was to create a device that goes on your knee to make knee rehabilita
 |:--:|:--:|:--:|:--:|
 | Alika G | Woodside Priory | Electrical Engineering | Incoming Junior
 
-
 <div align="center">
   <img src="Headstone.png" width="70%" height="70%" alt="Picture of me with device">
 </div>
