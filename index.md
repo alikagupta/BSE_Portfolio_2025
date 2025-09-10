@@ -109,7 +109,7 @@ Potentiometers are basically variable voltage dividers. As seen in Figure 7, pot
 </div>
 
 ## Vibration Motor:
-I wanted to create a silent mode that still provided the user with feedback, so I decided to use a vibration motor. There are multiple types of vibration motors, but the type that I chose is the most common. It is called an Eccentric Rotating Mass (ERM) vibration motor, and as the name suggests, it vibrates by rotating a mass. The mass is uneven, so as the mass is rotated at a fast speed, the motor moves in a vibrating motion. I used a coin or pancake-style motor, so unlike larger ERMs, you can't see the mass, but you can see Figure 7 for the structure under the cap. This type of motor is often used for haptic feedback in small devices, like it is in mine.
+I wanted to create a silent mode that still provided the user with feedback, so I decided to use a vibration motor. There are multiple types of vibration motors, but the type that I chose is the most common. It is called an Eccentric Rotating Mass (ERM) vibration motor, and as the name suggests, it vibrates by rotating a mass. The mass is uneven, so as the mass is rotated at a fast speed, the motor moves in a vibrating motion. I used a coin or pancake-style motor, so unlike larger ERMs, you can't see the mass, but you can see Figure 8 for the structure under the cap. This type of motor is often used for haptic feedback in small devices, like it is in mine.
 <div align="center">
   <img src="ERM.png" width="50%" height="50%">
 </div>
@@ -122,7 +122,7 @@ I wanted to create a silent mode that still provided the user with feedback, so 
 </div>
 
 ## Speaker:
-I decided to add a speaker to my project. To test this out, I made a circuit on the breadboard (Figure 8) and some test code just for it (see Speaker Test Code in Appendix A).
+I decided to add a speaker to my project. To test this out, I made a circuit on the breadboard (Figure 9) and some test code just for it (see Speaker Test Code in Appendix A).
 <div align="center">
   <img src="SpeakerScematics.png" width="40%" height="40%">
 </div>
